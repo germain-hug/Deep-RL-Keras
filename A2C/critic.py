@@ -14,9 +14,9 @@ class Critic(Agent):
         self.model.compile(Adam(lr), 'mse')
 
     def network(self):
-        """ Initialize Critic network
+        """ Critic network to predict value of each state
         """
         inp = Input((1, self.inp_dim))
-        x = Dense(128, activation='relu')(inp)
-        out = Dense(1)(x)
+        x = Dense(64, activation='relu', kernel_initializer='he_uniform')(inp)
+        out = Dense(1, activation='linear')(x)
         return Model(inp, out)

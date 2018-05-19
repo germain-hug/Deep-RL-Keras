@@ -14,9 +14,9 @@ class Actor(Agent):
         self.model.compile(Adam(lr), 'categorical_crossentropy')
 
     def network(self):
-        """ Initialize actor network
+        """ Actor network to predict probability of each action
         """
         inp = Input((1, self.inp_dim))
-        x = Dense(128, activation='relu')(inp)
+        x = Dense(64, activation='relu', kernel_initializer='he_uniform')(inp)
         out = Dense(self.out_dim, activation='softmax')(x)
         return Model(inp, out)

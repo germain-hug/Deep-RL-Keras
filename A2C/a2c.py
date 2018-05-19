@@ -18,7 +18,7 @@ class A2C:
         self.critic = Critic(env_dim, act_dim, 5 * lr)
 
     def policy_action(self, s):
-        """ Use the actor to predict the next action to take, stochastically
+        """ Use the actor to predict the next action to take, using the policy
         """
         if(len(s.shape) == 2): s = np.expand_dims(s, axis=0)
         return np.random.choice(np.arange(self.act_dim), 1, p=self.actor.predict(s).ravel())[0]
@@ -27,14 +27,18 @@ class A2C:
         """ Update actor and critic networks from experience
         """
         # Estimate state values using critic
-        V_0, V_1 = self.critic.predict(s_0), self.critic.predict(s_1)
+        V_0 = self.critic.predict(s_0)
+        V_1 = self.critic.predict(s_1)
+
         # Compute actor and critic training targets
         critic_t, actor_t = 0, np.zeros((1, self.act_dim))
         if done:
-            critic_t, actor_t[0][a] = r, r - V_0
+            critic_t = r
+            actor_t[0][a] = r - V_0
         else:
-            critic_t = r + self.gamma * V_1  # New state value (Critic Update)
-            actor_t[0][a] = r + self.gamma * V_1 - V_0 # Approx. TD Error (Actor Update)
+            critic_t = r + self.gamma * V_1  # State Value Update
+            actor_t[0][a] = r + self.gamma * V_1 - V_0 # Advantage
+
         # Train Actor and Critic
         self.actor.fit(s_0, actor_t)
         self.critic.fit(s_0, np.full((1, 1), critic_t))
