@@ -1,4 +1,4 @@
-""" Actor-Critic Algorithm (A2C) for OpenAI Gym environment
+""" Advantage Actor-Critic Algorithm (A2C) for OpenAI Gym environment
 """
 
 import sys
@@ -46,13 +46,14 @@ def main(args=None):
     if args.gpu:
         os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu
     set_session(get_session())
-    summary_writer = tf.summary.FileWriter("./Graph")
+    summary_writer = tf.summary.FileWriter("./tensorboard_" + args.env)
 
     # Initialization
     env = gym.make(args.env)
-    env_dim  = env.observation_space.shape[0]
+    env_dim  = env.observation_space.shape
     act_dim  = env.action_space.n
-    print(env.observation_space.shape)
+    print(env.observation_space.shape, env.action_space.n)
+
     a2c = A2C(act_dim, env_dim)
     solved = False
 
@@ -60,22 +61,20 @@ def main(args=None):
     for e in tqdm(range(args.nb_episodes)):
 
         time, cumul_reward, done = 0, 0, False
-        old_state = np.reshape(env.reset(), (1, env_dim))
+        old_state = env.reset()
+
         while not done:
             if args.render: env.render()
             # Actor picks an action (following the policy)
             a = a2c.policy_action(old_state)
             # Retrieve new state, reward, and whether the state is terminal
             new_state, r, done, _ = env.step(a)
-            cumul_reward += r
-            new_state = np.reshape(new_state, (1, env_dim))
-            # (Optionally) Penalize for having failed
-            if done and time < 500: r = -100
             # Train ie. compute updates, updated both networks
             if not solved:
-                a2c.train(old_state, a, r, new_state, done and time < 500)
+                a2c.train(old_state, a, r, new_state, done)
             # Update current state
             old_state = new_state
+            cumul_reward += r
             time += 1
 
         # Export results for Tensorboard
@@ -87,8 +86,8 @@ def main(args=None):
         env.render()
         a = a2c.policy_action(old_state)
         old_state, r, done, _ = env.step(a)
-        old_state = np.reshape(old_state, (1, env_dim))
         time += 1
+        if done: env.reset()
 
 
 if __name__ == "__main__":

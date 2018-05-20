@@ -7,20 +7,16 @@ class Agent:
     def __init__(self, inp_dim, out_dim):
         self.inp_dim = inp_dim
         self.out_dim = out_dim
-        self.model = self.network()
-
-    def network(self):
-        pass
 
     def fit(self, inp, targ):
         """ Perform one epoch of training
         """
-        self.model.fit(self.reshape(inp), self.reshape(targ), epochs=1, verbose=0, callbacks[])
+        self.model.fit(np.expand_dims(inp, axis=0), targ, epochs=1, verbose=0)
 
     def predict(self, inp):
         """ Critic Value Prediction
         """
-        return self.model.predict(self.reshape(inp))
+        return self.model.predict(np.expand_dims(inp, axis=0))
 
     def reshape(self, x):
         if len(x.shape) == 2: return np.expand_dims(x, axis=0)
