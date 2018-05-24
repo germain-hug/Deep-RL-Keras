@@ -10,6 +10,7 @@ import tensorflow as tf
 from a2c import A2C
 from tqdm import tqdm
 from keras.backend.tensorflow_backend import set_session
+from keras.utils import to_categorical
 
 def get_session():
     """ Limit session memory usage
@@ -52,16 +53,16 @@ def main(args=None):
     env = gym.make(args.env)
     env_dim  = env.observation_space.shape
     act_dim  = env.action_space.n
-    print(env.observation_space.shape, env.action_space.n)
-
     a2c = A2C(act_dim, env_dim)
-    solved = False
 
     # Main Loop
-    for e in tqdm(range(args.nb_episodes)):
+    tqdm_e = tqdm(range(args.nb_episodes), desc='Score', leave=True, unit=" episodes")
+    for e in tqdm_e:
 
+        # Reset episode
         time, cumul_reward, done = 0, 0, False
         old_state = env.reset()
+        actions, states, rewards = [], [], []
 
         while not done:
             if args.render: env.render()
@@ -69,18 +70,24 @@ def main(args=None):
             a = a2c.policy_action(old_state)
             # Retrieve new state, reward, and whether the state is terminal
             new_state, r, done, _ = env.step(a)
-            # Train ie. compute updates, updated both networks
-            if not solved:
-                a2c.train(old_state, a, r, new_state, done)
+            # Memorize (s, a, r) for training
+            actions.append(to_categorical(a, act_dim))
+            rewards.append(r)
+            states.append(old_state)
             # Update current state
             old_state = new_state
             cumul_reward += r
             time += 1
 
+        # Train using discounted rewards ie. compute updates
+        a2c.train(states, actions, rewards, done)
         # Export results for Tensorboard
         score = tfSummary('score', cumul_reward)
         summary_writer.add_summary(score, global_step=e)
         summary_writer.flush()
+        # Display score
+        tqdm_e.set_description("Score: " + str(cumul_reward))
+        tqdm_e.refresh()
 
     while True:
         env.render()

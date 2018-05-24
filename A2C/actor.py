@@ -1,4 +1,5 @@
 import numpy as np
+import keras.backend as K
 
 from keras.models import Model, load_model
 from keras.layers import Input, Dense, Flatten
@@ -12,11 +13,24 @@ class Actor(Agent):
     def __init__(self, inp_dim, out_dim, network, lr):
         Agent.__init__(self, inp_dim, out_dim)
         self.model = self.addHead(network)
-        self.model.compile(Adam(lr, decay=1e-6), 'categorical_crossentropy')
-        print(self.model.summary())
+        self.action_pl = K.placeholder(shape=(None, self.out_dim))
+        self.advantages_pl = K.placeholder(shape=(None,))
 
     def addHead(self, network):
         """ Assemble Actor network to predict probability of each action
         """
-        out = Dense(self.out_dim, activation='softmax')(network.output)
+        x = Dense(128, activation='relu')(network.output)
+        out = Dense(self.out_dim, activation='softmax')(x)
         return Model(network.input, out)
+
+    def optimizer(self):
+        """ Actor Optimization: Advantages + Entropy term to encourage exploration
+        (Cf. https://arxiv.org/abs/1602.01783)
+        """
+        weighted_actions = K.sum(self.action_pl * self.model.output, axis=1)
+        eligibility = K.log(weighted_actions + 1e-10) * K.stop_gradient(self.advantages_pl)
+        entropy = K.sum(self.model.output * K.log(self.model.output + 1e-10), axis=1)
+        loss = 0.01 * entropy - K.sum(eligibility)
+
+        updates = self.adam_optimizer.get_updates(self.model.trainable_weights, [], loss)
+        return K.function([self.model.input, self.action_pl, self.advantages_pl], [], updates=updates)

@@ -1,4 +1,5 @@
 import numpy as np
+from keras.optimizers import Adam
 
 class Agent:
     """ Agent Generic Class
@@ -7,17 +8,27 @@ class Agent:
     def __init__(self, inp_dim, out_dim):
         self.inp_dim = inp_dim
         self.out_dim = out_dim
+        self.adam_optimizer = Adam(0.001)
 
     def fit(self, inp, targ):
         """ Perform one epoch of training
         """
-        self.model.fit(np.expand_dims(inp, axis=0), targ, epochs=1, verbose=0)
+        self.model.fit(self.reshape(inp), targ, epochs=1, verbose=0)
 
     def predict(self, inp):
         """ Critic Value Prediction
         """
-        return self.model.predict(np.expand_dims(inp, axis=0))
+        return self.model.predict(self.reshape(inp))
 
     def reshape(self, x):
-        if len(x.shape) == 2: return np.expand_dims(x, axis=0)
+        if len(x.shape) < 2: return np.expand_dims(x, axis=0)
         else: return x
+
+    def trainable_weights(self):
+        return self.model.trainable_weights
+
+    def input(self):
+        return self.model.input
+
+    def output(self):
+        return self.model.output

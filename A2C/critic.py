@@ -1,4 +1,5 @@
 import numpy as np
+import keras.backend as K
 
 from keras.models import Model, load_model
 from keras.layers import Input, Dense, Flatten
@@ -12,11 +13,18 @@ class Critic(Agent):
     def __init__(self, inp_dim, out_dim, network, lr):
         Agent.__init__(self, inp_dim, out_dim)
         self.model = self.addHead(network)
-        self.model.compile(Adam(lr, decay=1e-6), 'mse')
-        print(self.model.summary())
+        self.discounted_r = K.placeholder(shape=(None,))
 
     def addHead(self, network):
-        """ Assemble Actor network to predict probability of each action
+        """ Assemble Critic network to predict value of each state
         """
-        out = Dense(1, activation='linear')(network.output)
+        x = Dense(128, activation='relu')(network.output)
+        out = Dense(1, activation='linear')(x)
         return Model(network.input, out)
+
+    def optimizer(self):
+        """ Critic Optimization: Mean Squared Error over discounted rewards
+        """
+        critic_loss = K.mean(K.square(self.discounted_r - self.model.output))
+        updates = self.adam_optimizer.get_updates(self.model.trainable_weights, [], critic_loss)
+        return K.function([self.model.input, self.discounted_r], [], updates=updates)

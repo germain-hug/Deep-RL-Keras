@@ -2,8 +2,7 @@ import numpy as np
 
 from keras.models import Model
 from keras import regularizers
-from keras.layers import Input, Dense, Conv2D, MaxPooling2D, Dropout, BatchNormalization, Flatten
-
+from keras.layers import Input, Dense, Conv2D, MaxPooling2D, BatchNormalization, Flatten
 from critic import Critic
 from actor import Actor
 
@@ -14,13 +13,17 @@ class A2C:
     def __init__(self, act_dim, env_dim, gamma = 0.99, lr = 0.001):
         """ Initialization
         """
-        # Create actor and critic networks
+        # Environment and A2C parameters
         self.act_dim = act_dim
         self.env_dim = env_dim
         self.gamma = gamma
+        # Create actor and critic networks
         self.shared = self.buildNetwork()
         self.actor = Actor(env_dim, act_dim, self.shared, lr)
-        self.critic = Critic(env_dim, act_dim, self.shared, 5 * lr)
+        self.critic = Critic(env_dim, act_dim, self.shared, lr)
+        # Build optimizers
+        self.a_opt = self.actor.optimizer()
+        self.c_opt = self.critic.optimizer()
 
     def buildNetwork(self):
         """ Assemble shared layers
@@ -31,9 +34,9 @@ class A2C:
             x = self.conv_block(inp, 32)
             x = self.conv_block(x, 32)
             x = Flatten()(x)
-            x = Dense(32, activation='relu', kernel_initializer='he_uniform')(x)
+            x = Dense(32, activation='relu')(x)
         else:
-            x = Dense(128, activation='relu', kernel_initializer='he_uniform')(inp)
+            x = Dense(64, activation='relu')(inp)
         return Model(inp, x)
 
     def conv_layer(self, d):
@@ -47,12 +50,10 @@ class A2C:
 
     def conv_block(self, inp, d):
         """ Returns a 2D Conv block, with a convolutional layer, max-pooling,
-        dropout and batch-normalization --- // TODO TRY INCEPTION ? //
+        dropout and batch-normalization
         """
         conv = self.conv_layer(d)(inp)
         pool = MaxPooling2D(pool_size=(2, 2))(conv)
-        bn = BatchNormalization()(pool)
-        drop = Dropout(0.3)(bn)
         return pool
 
     def policy_action(self, s):
@@ -60,22 +61,22 @@ class A2C:
         """
         return np.random.choice(np.arange(self.act_dim), 1, p=self.actor.predict(s).ravel())[0]
 
-    def train(self, s_0, a, r, s_1, done):
+    def discount(self, r):
+        """ Compute the gamma-discounted rewards over an episode
+        """
+        discounted_r, cumul_r = np.zeros_like(r), 0
+        for t in reversed(range(0, len(r))):
+            cumul_r = r[t] + cumul_r * self.gamma
+            discounted_r[t] = cumul_r
+        return discounted_r
+
+    def train(self, states, actions, rewards, done):
         """ Update actor and critic networks from experience
         """
-        # Estimate state values using critic
-        V_0 = self.critic.predict(s_0)
-        V_1 = self.critic.predict(s_1)
-
-        # Compute actor and critic training targets
-        critic_t, actor_t = 0, np.zeros((1, self.act_dim))
-        if done:
-            critic_t = r
-            actor_t[0][a] = r - V_0
-        else:
-            critic_t = r + self.gamma * V_1  # State Value Update
-            actor_t[0][a] = r + self.gamma * V_1 - V_0 # Advantage
-
-        # Train Actor and Critic
-        self.actor.fit(s_0, actor_t)
-        self.critic.fit(s_0, np.full((1, 1), critic_t))
+        # Compute discounted rewards and Advantage (TD. Error)
+        discounted_rewards = self.discount(rewards)
+        state_values = self.critic.predict(np.array(states))
+        advantages = discounted_rewards - np.reshape(state_values, len(state_values))
+        # Networks optimization
+        self.a_opt([states, actions, advantages])
+        self.c_opt([states, discounted_rewards])
