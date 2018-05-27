@@ -11,7 +11,7 @@ class Critic(Agent):
     """
 
     def __init__(self, inp_dim, out_dim, network, lr):
-        Agent.__init__(self, inp_dim, out_dim)
+        Agent.__init__(self, inp_dim, out_dim, lr)
         self.model = self.addHead(network)
         self.discounted_r = K.placeholder(shape=(None,))
 

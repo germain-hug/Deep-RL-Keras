@@ -51,8 +51,9 @@ def main(args=None):
 
     # Initialization
     env = gym.make(args.env)
-    env_dim  = env.observation_space.shape
-    act_dim  = env.action_space.n
+    env_dim = env.observation_space.shape
+    act_dim = env.action_space.n
+    isImage = (len(env_dim)==3)
     a2c = A2C(act_dim, env_dim)
 
     # Main Loop

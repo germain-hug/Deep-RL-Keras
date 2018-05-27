@@ -1,8 +1,10 @@
+import random
 import numpy as np
 
 from keras.models import Model
 from keras import regularizers
-from keras.layers import Input, Dense, Conv2D, MaxPooling2D, BatchNormalization, Flatten
+from keras.layers import Input, Dense, Conv2D, MaxPooling2D, BatchNormalization, Flatten, SimpleRNN
+
 from critic import Critic
 from actor import Actor
 
@@ -17,6 +19,7 @@ class A2C:
         self.act_dim = act_dim
         self.env_dim = env_dim
         self.gamma = gamma
+        self.epsilon = 0.1
         # Create actor and critic networks
         self.shared = self.buildNetwork()
         self.actor = Actor(env_dim, act_dim, self.shared, lr)
@@ -36,7 +39,8 @@ class A2C:
             x = Flatten()(x)
             x = Dense(32, activation='relu')(x)
         else:
-            x = Dense(64, activation='relu')(inp)
+            x = Dense(128, activation='relu')(inp)
+            #x = SimpleRNN(128, activation='relu', dropout=0.2, recurrent_dropout=0.2)(inp)
         return Model(inp, x)
 
     def conv_layer(self, d):
@@ -45,8 +49,7 @@ class A2C:
         return Conv2D(d, 3,
             activation = 'relu',
             padding = 'same',
-            kernel_initializer = 'he_normal',
-            kernel_regularizer = regularizers.l2(0.001))
+            kernel_initializer = 'he_normal')
 
     def conv_block(self, inp, d):
         """ Returns a 2D Conv block, with a convolutional layer, max-pooling,
@@ -59,7 +62,11 @@ class A2C:
     def policy_action(self, s):
         """ Use the actor to predict the next action to take, using the policy
         """
-        return np.random.choice(np.arange(self.act_dim), 1, p=self.actor.predict(s).ravel())[0]
+        if random.random() > self.epsilon:
+            self.epsilon *= 0.98
+            return np.random.choice(np.arange(self.act_dim), 1)[0]
+        else:
+            return np.random.choice(np.arange(self.act_dim), 1, p=self.actor.predict(s).ravel())[0]
 
     def discount(self, r):
         """ Compute the gamma-discounted rewards over an episode

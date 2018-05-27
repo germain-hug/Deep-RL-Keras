@@ -21,7 +21,7 @@ class A3C:
         self.shared = self.buildNetwork()
         self.actor = Actor(env_dim, act_dim, self.shared, lr)
         self.critic = Critic(env_dim, act_dim, self.shared, lr)
-        
+
         # Build optimizers
         self.a_opt = self.actor.optimizer()
         self.c_opt = self.critic.optimizer()

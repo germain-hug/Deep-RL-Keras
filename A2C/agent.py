@@ -5,10 +5,10 @@ class Agent:
     """ Agent Generic Class
     """
 
-    def __init__(self, inp_dim, out_dim):
+    def __init__(self, inp_dim, out_dim, lr):
         self.inp_dim = inp_dim
         self.out_dim = out_dim
-        self.adam_optimizer = Adam(0.001)
+        self.adam_optimizer = Adam(lr)
 
     def fit(self, inp, targ):
         """ Perform one epoch of training
