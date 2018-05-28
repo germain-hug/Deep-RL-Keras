@@ -3,11 +3,11 @@
 
 import sys
 import gym
-# import retro
 import argparse
 import threading
 import numpy as np
 import tensorflow as tf
+import time
 
 from a3c import A3C
 from tqdm import tqdm
@@ -100,7 +100,9 @@ def main(args=None):
 
     # Create threads
     threads = [threading.Thread(target=training_thread, args=(a3c, args.nb_episodes, gym.make(args.env), act_dim, summary_writer, isImage)) for i in range(args.n_threads)]
-    [t.start() for t in threads]
+    for t in threads:
+        t.start()
+        time.sleep(1)
     [t.join() for t in threads]
 
     # while True:
