@@ -20,7 +20,7 @@ This implementation requires keras 2.1.6, as well as OpenAI gym.
 pip install gym keras==2.1.6
 ```
 
-## N-step Advantage Actor Critic (A2C) [paper](https://papers.nips.cc/paper/1786-actor-critic-algorithms.pdf)
+## N-step Advantage Actor Critic (A2C) [[paper]](https://papers.nips.cc/paper/1786-actor-critic-algorithms.pdf)
 The Actor-Critic method is a Policy Gradient solving method where the gradients are scaled by a Value Function approximation, given by a critic. In this method, we update both the critic using the Bellman Equation, and the Actor using an Advantage factor. For more stability, we use a shared backbone, as well as an N-step formulation of the discounted rewards. We also incorporate an entropy regularization term ("soft" learning) to encourage exploration.  
 
 ```bash
