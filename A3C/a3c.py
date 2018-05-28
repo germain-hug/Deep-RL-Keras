@@ -10,7 +10,7 @@ class A3C:
     """ Asynchronous Actor-Critic Main Algorithm
     """
 
-    def __init__(self, act_dim, env_dim, gamma = 0.99, lr = 0.0001):
+    def __init__(self, act_dim, env_dim, gamma = 0.99, lr = 0.001):
         """ Initialization
         """
         # Environment and A2C parameters
@@ -38,6 +38,9 @@ class A3C:
             x = Dense(32, activation='relu')(x)
         else:
             x = Dense(64, activation='relu')(inp)
+            x = Dense(128, activation='relu')(x)
+            x = Reshape((1, 128))(x)
+            x = LSTM(256)(x)
         return Model(inp, x)
 
     def conv_layer(self, d):

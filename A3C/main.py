@@ -37,7 +37,7 @@ def parse_args(args):
     """
     parser = argparse.ArgumentParser(description='Training parameters')
     #
-    parser.add_argument('--n_threads', type=int, default=16, help="Number of threads")
+    parser.add_argument('--n_threads', type=int, default=4, help="Number of threads")
     parser.add_argument('--nb_episodes', type=int, default=5000, help="Number of training episodes")
     parser.add_argument('--env', type=str, default='CartPole-v1',help="OpenAI Gym Environment")
     parser.add_argument('--gpu', type=int, default=0, help='GPU ID')
@@ -101,7 +101,6 @@ def main(args=None):
     isImage = (len(env_dim)==3)
     factor = 100.0 / (args.nb_episodes)
     a3c = A3C(act_dim, env_dim)
-
     # Create threads
     tqdm_e = tqdm(range(args.nb_episodes), desc='Score', leave=True, unit=" episodes")
     threads = [threading.Thread(target=training_thread, args=(a3c, args.nb_episodes, gym.make(args.env), act_dim, summary_writer, isImage, tqdm_e, factor)) for i in range(args.n_threads)]

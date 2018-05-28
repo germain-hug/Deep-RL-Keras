@@ -3,7 +3,7 @@ import numpy as np
 
 from keras.models import Model
 from keras import regularizers
-from keras.layers import Input, Dense, Conv2D, MaxPooling2D, BatchNormalization, Flatten, SimpleRNN
+from keras.layers import Input, Dense, Conv2D, MaxPooling2D, BatchNormalization, Flatten, LSTM, Reshape
 
 from critic import Critic
 from actor import Actor
@@ -27,6 +27,7 @@ class A2C:
         # Build optimizers
         self.a_opt = self.actor.optimizer()
         self.c_opt = self.critic.optimizer()
+        print(self.shared.summary())
 
     def buildNetwork(self):
         """ Assemble shared layers
@@ -39,8 +40,10 @@ class A2C:
             x = Flatten()(x)
             x = Dense(32, activation='relu')(x)
         else:
-            x = Dense(128, activation='relu')(inp)
-            #x = SimpleRNN(128, activation='relu', dropout=0.2, recurrent_dropout=0.2)(inp)
+            x = Dense(64, activation='relu')(inp)
+            x = Dense(128, activation='relu')(x)
+            x = Reshape((1, 128))(x)
+            x = LSTM(256)(x)
         return Model(inp, x)
 
     def conv_layer(self, d):
