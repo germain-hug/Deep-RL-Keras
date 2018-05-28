@@ -29,6 +29,10 @@ In a similar fashion as the A2C algorithm, we implement a variant incorporating 
 
 Running:
 
+Running | Nb. Episodes | Render | GPU ID
+--- | --- | ---
+`python3 main.py` | `--nb_episodes 10000` | `--render` | `--gpu 0`
+
 <table>
   <tr>
     <th>Running</th>
@@ -37,9 +41,9 @@ Running:
     <th>GPU ID</th>
   </tr>
   <tr>
-    <td>`python3 main.py`</td>
-    <td>`--nb_episodes 10000`</td>
-    <td>`--render`</td>
-    <td>`--gpu 0`</td>
+    <td>python3 main.py</td>
+    <td>--nb_episodes 10000</td>
+    <td>--render</td>
+    <td>--gpu 0</td>
   </tr>
 </table>
