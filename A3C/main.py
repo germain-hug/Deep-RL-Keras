@@ -1,6 +1,7 @@
 """ Asynchronous Advantage Actor-Critic Algorithm (A3C) for OpenAI Gym environment
 """
 
+import os
 import sys
 import gym
 import argparse
@@ -16,6 +17,8 @@ from keras.utils import to_categorical
 from keras import backend as K
 
 episode = 0
+gym.logger.set_level(40)
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
 def get_session():
     """ Limit session memory usage
@@ -41,7 +44,7 @@ def parse_args(args):
     parser.set_defaults(render=False)
     return parser.parse_args(args)
 
-def training_thread(agent, nb_episodes, env, act_dim, summary_writer, isImage):
+def training_thread(agent, nb_episodes, env, act_dim, summary_writer, isImage, tqdm, factor):
     """ Build threads to run shared computation across
     """
     global episode
@@ -69,13 +72,14 @@ def training_thread(agent, nb_episodes, env, act_dim, summary_writer, isImage):
 
         # Train using discounted rewards ie. compute updates
         agent.train(states, actions, rewards, done)
-
         # Export results for Tensorboard
         score = tfSummary('score', cumul_reward)
         summary_writer.add_summary(score, global_step=episode)
         summary_writer.flush()
+        #
+        tqdm.set_description("Score: " + str(cumul_reward))
+        tqdm.update(int(episode * factor))
         episode += 1
-        print("Episode ", episode, " score ", cumul_reward)
 
 def main(args=None):
 
@@ -92,26 +96,19 @@ def main(args=None):
 
     # Initialization
     dummy_env = gym.make(args.env)
-    # dummy_env = retro.make(game='SonicTheHedgehog-Genesis', state='GreenHillZone.Act1', record='.')
     env_dim = dummy_env.observation_space.shape
     act_dim = dummy_env.action_space.n
     isImage = (len(env_dim)==3)
+    factor = 100.0 / (args.nb_episodes)
     a3c = A3C(act_dim, env_dim)
 
     # Create threads
-    threads = [threading.Thread(target=training_thread, args=(a3c, args.nb_episodes, gym.make(args.env), act_dim, summary_writer, isImage)) for i in range(args.n_threads)]
+    tqdm_e = tqdm(range(args.nb_episodes), desc='Score', leave=True, unit=" episodes")
+    threads = [threading.Thread(target=training_thread, args=(a3c, args.nb_episodes, gym.make(args.env), act_dim, summary_writer, isImage, tqdm_e, factor)) for i in range(args.n_threads)]
     for t in threads:
         t.start()
         time.sleep(1)
     [t.join() for t in threads]
-
-    # while True:
-    #     dummy_env.render()
-    #     a = a3c.policy_action(old_state)
-    #     old_state, r, done, _ = env.step(a)
-    #     time += 1
-    #     if done: env.reset()
-
 
 if __name__ == "__main__":
     main()
