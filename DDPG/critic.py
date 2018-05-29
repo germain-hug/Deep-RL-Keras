@@ -35,6 +35,16 @@ class Critic:
         out = K.multiply(x, self.act_range)
         return Model([state, action], out)
 
+    def target_predict(self, inp):
+        """ Predict Q-Values using the target network
+        """
+        return self.target_model.predict(inp)
+
+    def train_on_batch(states,actions,critic_target):
+        """ Train the critic network on batch of sampled experience
+        """
+        return self.model.train_on_batch([states, actions], critic_target)
+
     def transfer_weights(self):
         """ Transfer model weights to target model with a factor of Tau
         """

@@ -31,6 +31,12 @@ class Actor:
         out = K.multiply(x, self.act_range)
         return Model(inp, out)
 
+    def predict(self, state):
+        return self.model.predict(state)
+
+    def target_predict(self, inp):
+        return self.target_model.predict(inp)
+
     def transfer_weights(self):
         """ Transfer model weights to target model with a factor of Tau
         """

@@ -6,7 +6,7 @@ from collections import deque
 class MemoryBuffer(object):
     """ Memory Buffer Helper class for Experience Replay
     using a double-ended queue
-    
+
     (Thanks to Patrick Emami for template implementation)
     """
     def __init__(self, buffer_size):
@@ -14,8 +14,8 @@ class MemoryBuffer(object):
         self.buffer = deque()
         self.buffer_size = buffer_size
 
-    def add(self, state, action, reward, t, new_state):
-        experience = (state, action, reward, t, new_state)
+    def memorize(self, state, action, reward, done, new_state):
+        experience = (state, action, reward, done, new_state)
         # Check if buffer is already full
         if self.count < self.buffer_size:
             self.buffer.append(experience)
@@ -38,10 +38,10 @@ class MemoryBuffer(object):
         s_batch = np.array([i[0] for i in batch])
         a_batch = np.array([i[1] for i in batch])
         r_batch = np.array([i[2] for i in batch])
-        t_batch = np.array([i[3] for i in batch])
+        d_batch = np.array([i[3] for i in batch])
         s2_batch = np.array([i[4] for i in batch])
 
-        return s_batch, a_batch, r_batch, t_batch, s2_batch
+        return s_batch, a_batch, r_batch, d_batch, s2_batch
 
     def clear(self):
         self.buffer = deque()
