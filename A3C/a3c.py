@@ -2,7 +2,7 @@ import numpy as np
 
 from keras.models import Model
 from keras import regularizers
-from keras.layers import Input, Dense, Conv2D, MaxPooling2D, BatchNormalization, Flatten
+from keras.layers import Input, Dense, Conv2D, MaxPooling2D, Flatten, Reshape, LSTM
 from critic import Critic
 from actor import Actor
 
