@@ -3,7 +3,7 @@ import numpy as np
 
 from keras.models import Model
 from keras import regularizers
-from keras.layers import Input, Dense, Conv2D, MaxPooling2D, BatchNormalization, Flatten, LSTM, Reshape
+from keras.layers import Input, Dense, Conv2D, MaxPooling2D, BatchNormalization, Flatten
 
 from critic import Critic
 from actor import Actor
@@ -12,7 +12,7 @@ class A2C:
     """ Actor-Critic Main Algorithm
     """
 
-    def __init__(self, act_dim, env_dim, gamma = 0.99, lr = 0.001):
+    def __init__(self, act_dim, env_dim, gamma = 0.99, lr = 0.0001):
         """ Initialization
         """
         # Environment and A2C parameters
@@ -32,17 +32,8 @@ class A2C:
         """ Assemble shared layers
         """
         inp = Input((self.env_dim))
-        # If we have an image, apply convolutional layers
-        if(len(self.env_dim) > 2):
-            x = self.conv_block(inp, 32)
-            x = self.conv_block(x, 32)
-            x = Flatten()(x)
-            x = Dense(32, activation='relu')(x)
-        else:
-            x = Dense(64, activation='relu')(inp)
-            x = Dense(128, activation='relu')(x)
-            x = Reshape((1, 128))(x)
-            x = LSTM(256)(x)
+        x = Dense(64, activation='relu')(inp)
+        x = Dense(128, activation='relu')(x)
         return Model(inp, x)
 
     def conv_layer(self, d):
