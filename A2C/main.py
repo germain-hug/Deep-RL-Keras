@@ -5,6 +5,7 @@ import sys
 import gym
 import argparse
 import numpy as np
+import pandas as pd
 import tensorflow as tf
 
 from a2c import A2C
@@ -36,6 +37,20 @@ def parse_args(args):
     parser.set_defaults(render=False)
     return parser.parse_args(args)
 
+def gather_stats(a2c, env):
+    """ Compute average rewards over 10 episodes
+    """
+    score = []
+    for k in range(10):
+        old_state = env.reset()
+        cumul_r, done = 0, False
+        while not done:
+            a = a2c.policy_action(old_state)
+            old_state, r, done, _ = env.step(a)
+            cumul_r += r
+        score.append(cumul_r)
+    return np.mean(np.array(score)), np.std(np.array(score))
+
 def main(args=None):
 
     # Parse arguments
@@ -53,8 +68,8 @@ def main(args=None):
     env = gym.make(args.env)
     env_dim = env.observation_space.shape
     act_dim = env.action_space.n
-    isImage = (len(env_dim)==3)
     a2c = A2C(act_dim, env_dim)
+    results = []
 
     # Main Loop
     tqdm_e = tqdm(range(args.nb_episodes), desc='Score', leave=True, unit=" episodes")
@@ -82,6 +97,10 @@ def main(args=None):
 
         # Train using discounted rewards ie. compute updates
         a2c.train(states, actions, rewards, done)
+        # Gather stats every 50 episode for plotting
+        if(e%50==0):
+            mean, stdev = gather_stats(a2c, env)
+            results.append([mean, stdev])
         # Export results for Tensorboard
         score = tfSummary('score', cumul_reward)
         summary_writer.add_summary(score, global_step=e)
@@ -90,6 +109,11 @@ def main(args=None):
         tqdm_e.set_description("Score: " + str(cumul_reward))
         tqdm_e.refresh()
 
+    # Export results to CSV
+    df = pd.DataFrame(np.array(results))
+    df.to_csv("logs.csv", header=False, float_format='%10.5f')
+
+    # Display agent
     while True:
         env.render()
         a = a2c.policy_action(old_state)

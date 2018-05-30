@@ -26,5 +26,5 @@ class Critic(Agent):
         """ Critic Optimization: Mean Squared Error over discounted rewards
         """
         critic_loss = K.mean(K.square(self.discounted_r - self.model.output))
-        updates = self.adam_optimizer.get_updates(self.model.trainable_weights, [], critic_loss)
+        updates = self.rms_optimizer.get_updates(self.model.trainable_weights, [], critic_loss)
         return K.function([self.model.input, self.discounted_r], [], updates=updates)

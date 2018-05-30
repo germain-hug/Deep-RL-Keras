@@ -26,7 +26,6 @@ class A2C:
         # Build optimizers
         self.a_opt = self.actor.optimizer()
         self.c_opt = self.critic.optimizer()
-        print(self.shared.summary())
 
     def buildNetwork(self):
         """ Assemble shared layers
@@ -35,22 +34,6 @@ class A2C:
         x = Dense(64, activation='relu')(inp)
         x = Dense(128, activation='relu')(x)
         return Model(inp, x)
-
-    def conv_layer(self, d):
-        """ Returns a 2D Conv layer, with L2-regularization and ReLU activation
-        """
-        return Conv2D(d, 3,
-            activation = 'relu',
-            padding = 'same',
-            kernel_initializer = 'he_normal')
-
-    def conv_block(self, inp, d):
-        """ Returns a 2D Conv block, with a convolutional layer, max-pooling,
-        dropout and batch-normalization
-        """
-        conv = self.conv_layer(d)(inp)
-        pool = MaxPooling2D(pool_size=(2, 2))(conv)
-        return pool
 
     def policy_action(self, s):
         """ Use the actor to predict the next action to take, using the policy

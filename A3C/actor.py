@@ -11,7 +11,7 @@ class Actor(Agent):
     """
 
     def __init__(self, inp_dim, out_dim, network, lr):
-        Agent.__init__(self, inp_dim, out_dim)
+        Agent.__init__(self, inp_dim, out_dim, lr)
         self.model = self.addHead(network)
         self.action_pl = K.placeholder(shape=(None, self.out_dim))
         self.advantages_pl = K.placeholder(shape=(None,))
@@ -34,5 +34,5 @@ class Actor(Agent):
         entropy = K.sum(self.model.output * K.log(self.model.output + 1e-10), axis=1)
         loss = 0.01 * entropy - K.sum(eligibility)
 
-        updates = self.adam_optimizer.get_updates(self.model.trainable_weights, [], loss)
+        updates = self.rms_optimizer.get_updates(self.model.trainable_weights, [], loss)
         return K.function([self.model.input, self.action_pl, self.advantages_pl], [], updates=updates)
