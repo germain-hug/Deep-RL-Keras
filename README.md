@@ -27,15 +27,8 @@ The Actor-Critic algorithm is a model-free, off-policy method where the critic a
 python3 A2C/main.py --env CartPole-v1 --nb_episodes 10000 --render
 ```
 
-<br />
-<div align="center">
-<img width="30%" src ="https://github.com/germain-hug/Advanced-Deep-RL-Keras/blob/master/A2C/results/a2c.jpg?raw=true" />
-<img width="30%" src ="https://github.com/germain-hug/Advanced-Deep-RL-Keras/blob/master/A2C/results/a2c.gif?raw=true" />
-<p style="text-align=center";> Average Score per Episode (Cartpole-V1) and Results </p></div>  
-<br />
-
 ## N-step Asynchronous Advantage Actor Critic (A3C)
-In a similar fashion as the A2C algorithm, implementation of A3C, incorporating asynchronous weight updates. We use multiple agents to perform gradient ascent asynchronously, over multiple threads.
+In a similar fashion as the A2C algorithm, the implementation of A3C incorporates asynchronous weight updates, allowing for much faster computation. We use multiple agents to perform gradient ascent asynchronously, over multiple threads.
 
 ```bash
 python3 A3C/main.py --env CartPole-v1 --nb_episodes 10000 --n_threads 16
@@ -43,9 +36,9 @@ python3 A3C/main.py --env CartPole-v1 --nb_episodes 10000 --n_threads 16
 
 <br />
 <div align="center">
-<img width="30%" src ="https://github.com/germain-hug/Advanced-Deep-RL-Keras/blob/master/A3C/results/a3c.jpg?raw=true" />
-<img width="30%" src ="https://github.com/germain-hug/Advanced-Deep-RL-Keras/blob/master/A3C/results/a3c.gif?raw=true" />
-<p style="text-align=center";> Average Score per Episode (Cartpole-V1) and Results </p></div>  
+<img width="30%" src ="https://github.com/germain-hug/Advanced-Deep-RL-Keras/blob/master/A2C/results/a2c.jpg?raw=true" />
+<img width="30%" src ="https://github.com/germain-hug/Advanced-Deep-RL-Keras/blob/master/A2C/results/a2c.gif?raw=true" />
+<p style="text-align=center";> A2C / A3C Average Score per Episode (Cartpole-V1) and Results </p></div>  
 <br />
 
 ## Deep Deterministic Policy Gradient (DDPG)
