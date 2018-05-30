@@ -35,11 +35,11 @@ class DDPG:
         """
         return self.actor.target_predict(s)
 
-    def bellman(self, states, rewards, q_values, dones):
+    def bellman(self, rewards, q_values, dones):
         """ Use the Bellman Equation to compute the critic target
         """
-        critic_target = np.asarray(states)
-        for i in range(states.shape[0]):
+        critic_target = np.asarray(q_values)
+        for i in range(q_values.shape[0]):
             critic_target[i] = rewards[i] + self.gamma * q_values[i] * dones[i]
         return critic_target
 

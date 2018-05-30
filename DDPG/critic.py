@@ -22,6 +22,7 @@ class Critic:
         #
         self.model.compile(Adam(self.lr), 'mse')
         self.target_model.compile(Adam(self.lr), 'mse')
+        print(self.model.summary())
 
     def network(self):
         """ Assemble Critic network to predict q-values
@@ -44,7 +45,6 @@ class Critic:
     def train_on_batch(self, states, actions, critic_target):
         """ Train the critic network on batch of sampled experience
         """
-        print(states.shape, actions.shape, critic_target.shape)
         return self.model.train_on_batch([states, actions], critic_target)
 
     def transfer_weights(self):

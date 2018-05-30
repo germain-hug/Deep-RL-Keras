@@ -83,7 +83,7 @@ def main(args=None):
             # Predict target q-values using target networks
             q_values = ddpg.target_critic_predict(new_states, ddpg.target_actor_predict(new_states))
             # Compute critic target
-            critic_target = ddpg.bellman(states, rewards, q_values, dones)
+            critic_target = ddpg.bellman(rewards, q_values, dones)
             # Train both networks on sampled batch, update target networks
             ddpg.train_and_update(states, actions, critic_target)
             # Update current state
