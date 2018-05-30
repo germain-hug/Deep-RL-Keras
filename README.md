@@ -27,18 +27,9 @@ The Actor-Critic algorithm is a model-free, off-policy method where the critic a
 python3 A2C/main.py --env CartPole-v1 --nb_episodes 10000 --render
 ```
 
-<div align="center">
-<table style="width:100%; margin-left: auto;" align="center">
-  <tr>
-    <th> Average Score per Episode (Cartpole-V1) </th>
-    <th> Results </th>
-  </tr>
-  <tr>
-    <th><div align="center"><img width="250" src ="https://github.com/germain-hug/Advanced-Deep-RL-Keras/blob/master/A2C/results/a2c.jpg?raw=true" /></div></th>
-    <th><div align="center"><img width="250" src ="" /></div></th>
-  </tr>
-</table>
-</div>
+<br />
+<div align="center"><img width="40%" src ="https://github.com/germain-hug/Advanced-Deep-RL-Keras/blob/master/A2C/results/a2c.jpg?raw=true" /><p style="text-align=center";> Average Score per Episode (Cartpole-V1)</p></div>  
+<br />
 
 Link to [[paper]](https://papers.nips.cc/paper/1786-actor-critic-algorithms.pdf)
 
