@@ -31,10 +31,8 @@ python3 A2C/main.py --env CartPole-v1 --nb_episodes 10000 --render
 <div align="center">
 <img width="30%" src ="https://github.com/germain-hug/Advanced-Deep-RL-Keras/blob/master/A2C/results/a2c.jpg?raw=true" />
 <img width="30%" src ="https://github.com/germain-hug/Advanced-Deep-RL-Keras/blob/master/A2C/results/a2c.gif?raw=true" />
-<p style="text-align=center";> Average Score per Episode (Cartpole-V1)</p></div>  
+<p style="text-align=center";> Average Score per Episode (Cartpole-V1) and Results </p></div>  
 <br />
-
-Link to [[paper]](https://papers.nips.cc/paper/1786-actor-critic-algorithms.pdf)
 
 ## N-step Asynchronous Advantage Actor Critic (A3C)
 In a similar fashion as the A2C algorithm, implementation of A3C, incorporating asynchronous weight updates. We use multiple agents to perform gradient ascent asynchronously, over multiple threads.
@@ -43,7 +41,12 @@ In a similar fashion as the A2C algorithm, implementation of A3C, incorporating 
 python3 A3C/main.py --env CartPole-v1 --nb_episodes 10000 --n_threads 16
 ```
 
-Link to [[paper]](https://arxiv.org/pdf/1602.01783.pdf)
+<br />
+<div align="center">
+<img width="30%" src ="https://github.com/germain-hug/Advanced-Deep-RL-Keras/blob/master/A3C/results/a3c.jpg?raw=true" />
+<img width="30%" src ="https://github.com/germain-hug/Advanced-Deep-RL-Keras/blob/master/A3C/results/a3c.gif?raw=true" />
+<p style="text-align=center";> Average Score per Episode (Cartpole-V1) and Results </p></div>  
+<br />
 
 ## Deep Deterministic Policy Gradient (DDPG)
 The DDPG algorithm is a model-free, off-policy algorithm for continuous control. Similarly to A2C, it is an actor-critic algorithm in which the actor is trained on a deterministic target policy, and the critic predicts Q-Values (using TD errors). In order to reduce variance and increase stability, we use experience replay and separate target networks. Moreover, as hinted by [OpenAI](https://blog.openai.com/better-exploration-with-parameter-noise/), we encourage exploration through parameter space noise (as opposed to action space noise).
