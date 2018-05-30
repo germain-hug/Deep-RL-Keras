@@ -74,6 +74,7 @@ def main(args=None):
             if args.render: env.render()
             # Actor picks an action (following the deterministic policy)
             a = ddpg.get_action(old_state)
+            # TODO : Add EXPLORATION NOISE !! From a random process
             # Retrieve new state, reward, and whether the state is terminal
             new_state, r, done, _ = env.step(a)
             # Add outputs to memory buffer
