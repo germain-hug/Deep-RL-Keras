@@ -4,7 +4,7 @@ Implementation of various Deep Reinforcement Learning algorithms:
 
 - [x] N-step Advantage Actor Critic ([A2C](https://github.com/germain-hug/Advanced-Deep-RL-Keras#n-step-advantage-actor-critic-a2c))
 - [x] N-step Asynchronous Advantage Actor-Critic ([A3C](https://github.com/germain-hug/Advanced-Deep-RL-Keras#n-step-asynchronous-advantage-actor-critic-a3c))
-- [ ] Deep Deterministic Policy Gradient ([DDPG](https://github.com/germain-hug/Advanced-Deep-RL-Keras#deep-deterministic-policy-gradient-ddpg))
+- [ ] Deep Deterministic Policy Gradient with Parameter Noise ([DDPG](https://github.com/germain-hug/Advanced-Deep-RL-Keras#deep-deterministic-policy-gradient-ddpg))
 - [ ] REINFORCE
 - [ ] Deep Q-Learning (DQN)
 - [ ] Dueling DQN (DDQN)
@@ -39,7 +39,7 @@ python3 A3C/main.py --env CartPole-v1 --nb_episodes 10000 --n_threads 16
 Link to [[paper]](https://arxiv.org/pdf/1602.01783.pdf)
 
 ## Deep Deterministic Policy Gradient (DDPG)
-The DDPG algorithm is a model-free, off-policy algorithm for continuous control. Similarly to A2C, it is an actor-critic algorithm in which the actor is trained on a deterministic target policy, and the critic predicts Q-Values (using TD errors). In order to reduce variance and increase stability, we use experience replay and separate target networks.
+The DDPG algorithm is a model-free, off-policy algorithm for continuous control. Similarly to A2C, it is an actor-critic algorithm in which the actor is trained on a deterministic target policy, and the critic predicts Q-Values (using TD errors). In order to reduce variance and increase stability, we use experience replay and separate target networks. Moreover, as hinted by [OpenAI](https://blog.openai.com/better-exploration-with-parameter-noise/), we encourage exploration through parameter space noise (as opposed to action space noise).
 
 
 # Acknowledgments

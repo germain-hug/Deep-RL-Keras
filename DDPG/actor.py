@@ -3,7 +3,7 @@ import tensorflow as tf
 import keras.backend as K
 
 from keras.models import Model, load_model
-from keras.layers import Input, Dense, Reshape, LSTM, Lambda
+from keras.layers import Input, Dense, Reshape, LSTM, Lambda, BatchNormalization, GaussianNoise
 
 class Actor:
     """ Actor Network for the DDPG Algorithm
@@ -21,14 +21,23 @@ class Actor:
 
     def network(self):
         """ Actor Network for Policy function Approximation, using a tanh
-        activation for continuous control
+        activation for continuous control. We add parameter noise to encourage
+        exploration, and balance it with Layer Normalization.
         """
         inp = Input((self.env_dim))
+        #
         x = Dense(128, activation='relu')(inp)
+        x = GaussianNoise(0.1)(x)
+        x = BatchNormalization()(x)
+        #
         x = Dense(256, activation='relu')(x)
+        x = GaussianNoise(0.1)(x)
+        x = BatchNormalization()(x)
+        #
         x = Reshape((1, 256))(x)
         x = LSTM(256)(x)
         x = Dense(self.act_dim, activation='tanh')(x)
+        #
         out = Lambda(lambda i: i * self.act_range)(x)
         return Model(inp, out)
 
