@@ -34,7 +34,7 @@ python3 A2C/main.py --env CartPole-v1 --nb_episodes 10000 --render
     <th> Results </th>
   </tr>
   <tr>
-    <th><div align="center"><img width="250" src ="" /></div></th>
+    <th><div align="center"><img width="250" src ="https://github.com/germain-hug/Advanced-Deep-RL-Keras/blob/master/A2C/results/a2c.jpg?raw=true" /></div></th>
     <th><div align="center"><img width="250" src ="" /></div></th>
   </tr>
 </table>
