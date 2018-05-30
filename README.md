@@ -46,6 +46,6 @@ The DDPG algorithm is a model-free, off-policy algorithm for continuous control.
 
 # References
 
-- Advantage Actor Critic (A2C) : [[paper]](https://papers.nips.cc/paper/1786-actor-critic-algorithms.pdf)
-- Asynchronous Advantage Actor Critic (A3C) : [[paper]](https://arxiv.org/pdf/1602.01783.pdf)
-- Deep Deterministic Policy Gradient (DDPG) : [[paper]](http://proceedings.mlr.press/v32/silver14.pdf)
+- _Advantage Actor Critic (A2C)_ : [[paper]](https://papers.nips.cc/paper/1786-actor-critic-algorithms.pdf)
+- _Asynchronous Advantage Actor Critic (A3C)_ : [[paper]](https://arxiv.org/pdf/1602.01783.pdf)
+- _Deep Deterministic Policy Gradient (DDPG)_ : [[paper]](http://proceedings.mlr.press/v32/silver14.pdf)
