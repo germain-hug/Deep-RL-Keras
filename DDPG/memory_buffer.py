@@ -24,10 +24,10 @@ class MemoryBuffer(object):
             self.buffer.popleft()
             self.buffer.append(experience)
 
-     def size(self):
-         return self.count
+    def size(self):
+        return self.count
 
-     def sample_batch(self, batch_size):
+    def sample_batch(self, batch_size):
         batch = []
 
         if self.count < batch_size:

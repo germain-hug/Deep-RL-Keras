@@ -3,20 +3,21 @@ import tensorflow as tf
 import keras.backend as K
 
 from keras.models import Model, load_model
-from keras.layers import Input, Dense
+from keras.layers import Input, Dense, Reshape, LSTM, Lambda
 
 class Actor:
     """ Actor Network for the DDPG Algorithm
     """
 
-    def __init__(self, inp_dim, out_dim, lr, tau):
-        self.inp_dim = inp_dim
-        self.out_dim = out_dim
+    def __init__(self, inp_dim, out_dim, act_range, lr, tau):
+        self.env_dim = inp_dim
+        self.act_dim = out_dim
+        self.act_range = act_range
         self.tau = tau
         self.lr = lr
         self.model = self.network()
         self.target_model = self.network()
-        self.action_gdts = K.placeholder(shape=(None, self.out_dim))
+        self.action_gdts = K.placeholder(shape=(None, self.act_dim))
 
     def network(self):
         """ Actor Network for Policy function Approximation, using a tanh
@@ -28,11 +29,11 @@ class Actor:
         x = Reshape((1, 256))(x)
         x = LSTM(256)(x)
         x = Dense(self.act_dim, activation='tanh')(x)
-        out = K.multiply(x, self.act_range)
+        out = Lambda(lambda i: i * self.act_range)(x)
         return Model(inp, out)
 
     def predict(self, state):
-        return self.model.predict(state)
+        return self.model.predict(np.expand_dims(state, axis=0))
 
     def target_predict(self, inp):
         return self.target_model.predict(inp)

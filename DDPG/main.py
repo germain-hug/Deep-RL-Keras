@@ -36,7 +36,7 @@ def parse_args(args):
     #
     parser.add_argument('--nb_episodes', type=int, default=5000, help="Number of training episodes")
     parser.add_argument('--batch_size', type=int, default=64, help="Batch size (experience replay)")
-    parser.add_argument('--env', type=str, default='CartPole-v1',help="OpenAI Gym Environment")
+    parser.add_argument('--env', type=str, default='BipedalWalker-v2',help="OpenAI Gym Environment")
     parser.add_argument('--gpu', type=int, default=0, help='GPU ID')
     parser.set_defaults(render=False)
     return parser.parse_args(args)
@@ -56,9 +56,10 @@ def main(args=None):
 
     # Initialization
     env = gym.make(args.env)
-    env_dim = dummy_env.observation_space.shape
-    act_dim = dummy_env.action_space.n
-    ddpg = DDPG(act_dim, env_dim)
+    env.reset()
+    env_dim = env.observation_space.shape
+    act_dim, act_range = 4, 1 #env.action_space.n
+    ddpg = DDPG(act_dim, env_dim, act_range)
 
     # First, gather experience
     tqdm_e = tqdm(range(args.nb_episodes), desc='Score', leave=True, unit=" episodes")
@@ -70,10 +71,9 @@ def main(args=None):
         actions, states, rewards = [], [], []
 
         while not done:
-
             if args.render: env.render()
-            # Actor picks an action (following the policy)
-            a = ddpg.get_value(old_state)
+            # Actor picks an action (following the deterministic policy)
+            a = ddpg.get_action(old_state)
             # Retrieve new state, reward, and whether the state is terminal
             new_state, r, done, _ = env.step(a)
             # Add outputs to memory buffer
@@ -85,7 +85,7 @@ def main(args=None):
             # Compute critic target
             critic_target = ddpg.bellman(states, rewards, q_values, dones)
             # Train both networks on sampled batch, update target networks
-            loss = ddpg.train_and_update(states, actions, critic_target)
+            ddpg.train_and_update(states, actions, critic_target)
             # Update current state
             old_state = new_state
             cumul_reward += r

@@ -1,17 +1,18 @@
 import numpy as np
+import tensorflow as tf
 import keras.backend as K
 
 from keras.models import Model, load_model
 from keras.optimizers import Adam
-from keras.layers import Input, Dense, concatenate
+from keras.layers import Input, Dense, concatenate, LSTM, Reshape, Lambda
 
 class Critic:
     """ Critic for the DDPG Algorithm, Q-Value function approximator
     """
 
     def __init__(self, inp_dim, out_dim, lr, tau):
-        self.inp_dim = inp_dim
-        self.out_dim = out_dim
+        self.env_dim = inp_dim
+        self.act_dim = out_dim
         self.tau = tau
         self.lr = lr
         #
@@ -23,16 +24,16 @@ class Critic:
         self.target_model.compile(Adam(self.lr), 'mse')
 
     def network(self):
-        """ Assemble Critic network to predict value of each state
+        """ Assemble Critic network to predict q-values
         """
         state = Input((self.env_dim))
-        action = Input((self.act_dim))
+        action = Input((self.act_dim,))
         x1 = Dense(128, activation='relu')(state)
         x2 = Dense(128, activation='relu')(action)
         x = concatenate([x1, x2])
+        x = Reshape((1, 256))(x)
         x = LSTM(256)(x)
-        x = Dense(1, activation='linear')(x)
-        out = K.multiply(x, self.act_range)
+        out = Dense(1, activation='linear')(x)
         return Model([state, action], out)
 
     def target_predict(self, inp):
@@ -40,9 +41,10 @@ class Critic:
         """
         return self.target_model.predict(inp)
 
-    def train_on_batch(states,actions,critic_target):
+    def train_on_batch(self, states, actions, critic_target):
         """ Train the critic network on batch of sampled experience
         """
+        print(states.shape, actions.shape, critic_target.shape)
         return self.model.train_on_batch([states, actions], critic_target)
 
     def transfer_weights(self):
