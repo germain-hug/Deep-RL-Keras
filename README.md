@@ -31,7 +31,7 @@ python3 A2C/main.py --env CartPole-v1 --nb_episodes 10000 --render
 <div align="center">
 <img width="30%" src ="https://github.com/germain-hug/Advanced-Deep-RL-Keras/blob/master/A2C/results/a2c.jpg?raw=true" />
 <img width="30%" src ="https://github.com/germain-hug/Advanced-Deep-RL-Keras/blob/master/A2C/results/a2c.gif?raw=true" />
-<p style="text-align=center";> Average Score per Episode (Cartpole-V1)</p></div>  
+<p style="text-align=center";> Average Score per Episode (Cartpole-V1) and Results </p></div>  
 <br />
 
 Link to [[paper]](https://papers.nips.cc/paper/1786-actor-critic-algorithms.pdf)
