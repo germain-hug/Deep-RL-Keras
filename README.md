@@ -30,7 +30,7 @@ python3 A2C/main.py --env CartPole-v1 --nb_episodes 10000 --render
 <div align="center">
 <img width="50%" src ="https://github.com/germain-hug/Advanced-Deep-RL-Keras/blob/master/A2C/results/a2c.png?raw=true" />
 <img width="30%" src ="https://github.com/germain-hug/Advanced-Deep-RL-Keras/blob/master/A2C/results/a2c.gif?raw=true" />
-<p style="text-align=center";> A2C Per-Episode Score and Results [Cartpole-V1] </p></div>  
+<p style="text-align=center";> A2C Average Score and Results [Cartpole-V1] </p></div>  
 <br />
 
 ## N-step Asynchronous Advantage Actor Critic (A3C)
