@@ -21,11 +21,17 @@ pip install gym keras==2.1.6
 ```
 
 ## N-step Advantage Actor Critic (A2C)
-The Actor-Critic algorithm is a model-free, off-policy method where the critic acts as a value-function approximator, and the actor as a policy-function approximator. When training, the critic predicts the TD-Error and guides the learning of both itself and the actor. In practice, we approximate the TD-Error using the Advantage function. For more stability, we use a shared computational backbone across both networks, as well as an N-step formulation of the discounted rewards. We also incorporate an entropy regularization term ("soft" learning) to encourage exploration.  
+The Actor-Critic algorithm is a model-free, off-policy method where the critic acts as a value-function approximator, and the actor as a policy-function approximator. When training, the critic predicts the TD-Error and guides the learning of both itself and the actor. In practice, we approximate the TD-Error using the Advantage function. For more stability, we use a shared computational backbone across both networks, as well as an N-step formulation of the discounted rewards. We also incorporate an entropy regularization term ("soft" learning) to encourage exploration. While A2C is simple and efficient, running it on Atari Games quickly becomes intractable due to long computation time. However, one can parallelize computation using multi-threaded agents, which is the point of A3C.
 
 ```bash
 python3 A2C/main.py --env CartPole-v1 --nb_episodes 10000 --render
 ```
+<br />
+<div align="center">
+<img width="30%" src ="https://github.com/germain-hug/Advanced-Deep-RL-Keras/blob/master/A2C/results/a2c.jpg?raw=true" />
+<img width="30%" src ="https://github.com/germain-hug/Advanced-Deep-RL-Keras/blob/master/A2C/results/a2c.gif?raw=true" />
+<p style="text-align=center";> A2C / A3C Per-Episode Score and Results [Cartpole-V1] </p></div>  
+<br />
 
 ## N-step Asynchronous Advantage Actor Critic (A3C)
 In a similar fashion as the A2C algorithm, the implementation of A3C incorporates asynchronous weight updates, allowing for much faster computation. We use multiple agents to perform gradient ascent asynchronously, over multiple threads.
@@ -34,16 +40,10 @@ In a similar fashion as the A2C algorithm, the implementation of A3C incorporate
 python3 A3C/main.py --env CartPole-v1 --nb_episodes 10000 --n_threads 16
 ```
 
-<br />
-<div align="center">
-<img width="30%" src ="https://github.com/germain-hug/Advanced-Deep-RL-Keras/blob/master/A2C/results/a2c.jpg?raw=true" />
-<img width="30%" src ="https://github.com/germain-hug/Advanced-Deep-RL-Keras/blob/master/A2C/results/a2c.gif?raw=true" />
-<p style="text-align=center";> A2C / A3C Per-Episode Score and Results [Cartpole-V1] </p></div>  
-<br />
-
 ## Deep Deterministic Policy Gradient (DDPG)
 The DDPG algorithm is a model-free, off-policy algorithm for continuous control. Similarly to A2C, it is an actor-critic algorithm in which the actor is trained on a deterministic target policy, and the critic predicts Q-Values (using TD errors). In order to reduce variance and increase stability, we use experience replay and separate target networks. Moreover, as hinted by [OpenAI](https://blog.openai.com/better-exploration-with-parameter-noise/), we encourage exploration through parameter space noise (as opposed to action space noise).
 
+# Visualization
 
 # Acknowledgments
 
