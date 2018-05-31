@@ -16,6 +16,7 @@ from keras.backend.tensorflow_backend import set_session
 from keras.utils import to_categorical
 from keras import backend as K
 
+sys.path.append('../utils/')
 from AtariEnvironment import AtariEnvironment
 
 episode = 0
@@ -48,18 +49,17 @@ def parse_args(args):
     parser.set_defaults(render=False)
     return parser.parse_args(args)
 
-def training_thread(agent, nb_episodes, env, action_dim, k, f, summary_writer, tqdm, factor):
+def training_thread(agent, Nmax, env, action_dim, k, f, summary_writer, tqdm, factor):
     """ Build threads to run shared computation across
     """
 
     global episode
-    while episode < nb_episodes:
+    while episode < Nmax:
 
         # Reset episode
         time, cumul_reward, done = 0, 0, False
         old_state = env.get_initial_state()
         actions, states, rewards = [], [], []
-
         while not done:
             # Actor picks an action (following the policy)
             a = agent.policy_action(np.expand_dims(old_state, axis=0))
@@ -76,7 +76,9 @@ def training_thread(agent, nb_episodes, env, action_dim, k, f, summary_writer, t
             # Asynchronous training
             if(time%f==0 or done):
                 agent.train(states, actions, rewards, done)
+                actions, states, rewards = [], [], []
 
+        print(episode)
         # Export results for Tensorboard
         score = tfSummary('score', cumul_reward)
         summary_writer.add_summary(score, global_step=episode)

@@ -27,7 +27,7 @@ class Agent:
         return self.target_model.predict(self.reshape(inp))
 
     def reshape(self, x):
-        if len(x.shape) < 2: return np.expand_dims(x, axis=0)
+        if len(x.shape) < 4: return np.expand_dims(x, axis=0)
         else: return x
 
     def transfer_weights(self):
@@ -35,5 +35,6 @@ class Agent:
         """
         W, target_W = self.model.get_weights(), self.target_model.get_weights()
         for i in range(len(W)):
+            print(W[i], target_W[i])
             target_W[i] = self.tau * W[i] + (1 - self.tau)* target_W[i]
         self.target_model.set_weights(target_W)

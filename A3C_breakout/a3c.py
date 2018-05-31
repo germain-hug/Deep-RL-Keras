@@ -22,7 +22,6 @@ class A3C:
         self.shared_target = self.buildNetwork()
         self.actor = Actor(env_dim, act_dim, self.shared, self.shared_target, lr)
         self.critic = Critic(env_dim, act_dim, self.shared, self.shared_target, lr)
-
         # Build optimizers
         self.a_opt = self.actor.optimizer()
         self.c_opt = self.critic.optimizer()
@@ -54,7 +53,7 @@ class A3C:
         return MaxPooling2D(pool_size=pool_size)(conv)
 
     def policy_action(self, s):
-        """ Use the actor to predict the next action to take, using the policy
+        """ Use the actor's target network to predict the next action to take, using the policy
         """
         return np.random.choice(np.arange(self.act_dim), 1, p=self.actor.predict(s).ravel())[0]
 
@@ -80,5 +79,5 @@ class A3C:
         self.a_opt([states, actions, advantages])
         self.c_opt([states, discounted_rewards])
         # Transfer weights to target network
-        self.actor.transfer_weights()
-        self.critic.transfer_weights()
+        #self.actor.transfer_weights()
+        #self.critic.transfer_weights()
