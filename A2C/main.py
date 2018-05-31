@@ -100,7 +100,7 @@ def main(args=None):
         # Gather stats every 50 episode for plotting
         if(e%50==0):
             mean, stdev = gather_stats(a2c, env)
-            results.append([mean, stdev])
+            results.append([e, mean, stdev])
         # Export results for Tensorboard
         score = tfSummary('score', cumul_reward)
         summary_writer.add_summary(score, global_step=e)
@@ -111,7 +111,7 @@ def main(args=None):
 
     # Export results to CSV
     df = pd.DataFrame(np.array(results))
-    df.to_csv("logs.csv", header=False, float_format='%10.5f')
+    df.to_csv("logs.csv", header=['Episode', 'Mean', 'Stddev'], float_format='%10.5f')
 
     # Display agent
     while True:
