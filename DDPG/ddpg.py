@@ -56,10 +56,11 @@ class DDPG:
         """
         # Train critic
         self.critic.train_on_batch(states, actions, critic_target)
+        # Q-Value Gradients under Current Policy
+        actions = self.actor.model.predict(states)
+        grads = self.critic.gradients(states, actions)
         # Train actor
-        a_for_grad = self.actor.model.predict(states)
-        grads = self.critic.gradients(states, a_for_grad) # TODO
-        self.actor.train(states, grads)
-        # Transfer weights to target networks
+        self.actor.train(states, actions, np.array(grads).reshape((-1, 4)))
+        # Transfer weights to target networks at rate Tau
         self.actor.transfer_weights()
         self.critic.transfer_weights()
