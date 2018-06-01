@@ -32,7 +32,8 @@ class Critic:
         x1 = Dense(128, activation='relu')(state)
         x2 = Dense(128, activation='relu')(action)
         x = concatenate([x1, x2])
-        x = Dense(128, activation='relu')(x)
+        x = Reshape((1, (256)))(x)
+        x = LSTM(256)(x)
         out = Dense(1, activation='linear')(x)
         return Model([state, action], out)
 

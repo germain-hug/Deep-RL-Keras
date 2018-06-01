@@ -75,7 +75,8 @@ def main(args=None):
     env = gym.make(args.env)
     env.reset()
     env_dim = env.observation_space.shape
-    act_dim, act_range = 4, 1 #env.action_space.n
+    #print(env.action_space)
+    act_dim, act_range = 2, 0.99 #env.action_space.n
     ddpg = DDPG(act_dim, env_dim, act_range)
     results = []
 
