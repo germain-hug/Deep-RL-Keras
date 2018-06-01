@@ -4,7 +4,7 @@ import keras.backend as K
 
 from keras.models import Model, load_model
 from keras.optimizers import Adam
-from keras.layers import Input, Dense, concatenate, LSTM, Reshape, Lambda
+from keras.layers import Input, Dense, concatenate, LSTM, Reshape, Lambda, Flatten
 
 class Critic:
     """ Critic for the DDPG Algorithm, Q-Value function approximator
@@ -23,7 +23,6 @@ class Critic:
         # Function to compute Q-value gradients (Actor Optimization)
         self.action_grads = K.function([self.model.input[0], self.model.input[1]], K.gradients(self.model.output, [self.model.input[1]]))
 
-
     def network(self):
         """ Assemble Critic network to predict q-values
         """
@@ -31,8 +30,9 @@ class Critic:
         action = Input((self.act_dim,))
         x1 = Dense(128, activation='relu')(state)
         x2 = Dense(128, activation='relu')(action)
-        x = concatenate([x1, x2])
-        x = Reshape((1, (256)))(x)
+        x = concatenate([Flatten()(x1), x2])
+        x = Dense(128, activation='relu')(x)
+        x = Reshape((1, (128)))(x)
         x = LSTM(256)(x)
         out = Dense(1, activation='linear')(x)
         return Model([state, action], out)

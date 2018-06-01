@@ -12,6 +12,8 @@ import tensorflow as tf
 from tqdm import tqdm
 from keras.backend.tensorflow_backend import set_session
 
+sys.path.append('../utils/')
+from environment import Environment
 from ddpg import DDPG
 
 episode = 0
@@ -37,6 +39,7 @@ def parse_args(args):
     #
     parser.add_argument('--nb_episodes', type=int, default=5000, help="Number of training episodes")
     parser.add_argument('--batch_size', type=int, default=64, help="Batch size (experience replay)")
+    parser.add_argument('--consecutive_frames', type=int, default=3, help="Number of consecutive frames (action repeat)")
     parser.add_argument('--gather_stats', dest='gather_stats', action='store_true',help="Compute Average reward per episode (slower)")
     parser.add_argument('--render', dest='render', action='store_true', help="Render environment")
     parser.add_argument('--env', type=str, default='BipedalWalker-v2',help="OpenAI Gym Environment")
@@ -72,12 +75,12 @@ def main(args=None):
     summary_writer = tf.summary.FileWriter("./tensorboard_" + args.env)
 
     # Initialization
-    env = gym.make(args.env)
+    env = Environment(gym.make(args.env), args.consecutive_frames)
     env.reset()
-    env_dim = env.observation_space.shape
+    state_dim = env.get_state_size()
     #print(env.action_space)
     act_dim, act_range = 2, 0.99 #env.action_space.n
-    ddpg = DDPG(act_dim, env_dim, act_range)
+    ddpg = DDPG(act_dim, state_dim, act_range, args.consecutive_frames)
     results = []
 
     # First, gather experience

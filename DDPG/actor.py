@@ -3,7 +3,7 @@ import tensorflow as tf
 import keras.backend as K
 
 from keras.models import Model, load_model
-from keras.layers import Input, Dense, Reshape, LSTM, Lambda, BatchNormalization, GaussianNoise
+from keras.layers import Input, Dense, Reshape, LSTM, Lambda, BatchNormalization, GaussianNoise, Flatten
 
 class Actor:
     """ Actor Network for the DDPG Algorithm
@@ -17,7 +17,6 @@ class Actor:
         self.lr = lr
         self.model = self.network()
         self.target_model = self.network()
-
         self.adam_optimizer = self.optimizer()
 
     def network(self):
@@ -31,6 +30,7 @@ class Actor:
         x = GaussianNoise(1.0)(x)
         x = BatchNormalization()(x)
         #
+        x = Flatten()(x)
         x = Dense(128, activation='relu')(x)
         x = GaussianNoise(1.0)(x)
         x = BatchNormalization()(x)
