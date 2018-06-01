@@ -78,7 +78,6 @@ def training_thread(agent, Nmax, env, action_dim, k, f, summary_writer, tqdm, fa
                 agent.train(states, actions, rewards, done)
                 actions, states, rewards = [], [], []
 
-        print(episode)
         # Export results for Tensorboard
         score = tfSummary('score', cumul_reward)
         summary_writer.add_summary(score, global_step=episode)
