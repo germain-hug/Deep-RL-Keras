@@ -13,9 +13,9 @@ def main(args=None):
         x=df['Episode'],
         y=df['Mean']+df['Stddev'],
         mode='lines',
-        marker=dict(color='rgb(255,226,219)'),
+        marker=dict(color="444"),
         line=dict(width=0),
-        fillcolor='rgba(253,112,74, 0.2)',
+        fillcolor='rgba(68, 68, 68, 0.3)',
         fill='tonexty')
 
     trace = go.Scatter(
@@ -23,15 +23,15 @@ def main(args=None):
         x=df['Episode'],
         y=df['Mean'],
         mode='lines',
-        line=dict(color='rgb(253,112,74)'),
-        fillcolor='rgba(253,112,74, 0.2)',
+        line=dict(color='rgb(31, 119, 180)'),
+        fillcolor='rgba(68, 68, 68, 0.3)',
         fill='tonexty')
 
     lower_bound = go.Scatter(
         name='Lower Bound',
         x=df['Episode'],
         y=df['Mean']-df['Stddev'],
-        marker=dict(color='rgb(255,226,219)'),
+        marker=dict(color="444"),
         line=dict(width=0),
         mode='lines')
 
@@ -40,12 +40,12 @@ def main(args=None):
     data = [lower_bound, trace, upper_bound]
 
     layout = go.Layout(
-        yaxis=dict(title='Score'),
-        title='Average Reward Over time',
+        yaxis=dict(title='Wind speed (m/s)'),
+        title='Continuous, variable value error bars.<br>Notice the hover text!',
         showlegend = False)
 
     fig = go.Figure(data=data, layout=layout)
-    py.iplot(fig, filename='average_rewards_over_episodes')
+    py.iplot(fig, filename='pandas-continuous-error-bars')
 
 if __name__ == "__main__":
     main()

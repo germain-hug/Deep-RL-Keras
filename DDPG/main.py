@@ -6,11 +6,14 @@ import sys
 import gym
 import argparse
 import numpy as np
+import pandas as pd
 import tensorflow as tf
 
 from tqdm import tqdm
 from keras.backend.tensorflow_backend import set_session
 
+sys.path.append('../utils/')
+from environment import Environment
 from ddpg import DDPG
 
 episode = 0
@@ -36,10 +39,27 @@ def parse_args(args):
     #
     parser.add_argument('--nb_episodes', type=int, default=5000, help="Number of training episodes")
     parser.add_argument('--batch_size', type=int, default=64, help="Batch size (experience replay)")
+    parser.add_argument('--consecutive_frames', type=int, default=3, help="Number of consecutive frames (action repeat)")
+    parser.add_argument('--gather_stats', dest='gather_stats', action='store_true',help="Compute Average reward per episode (slower)")
+    parser.add_argument('--render', dest='render', action='store_true', help="Render environment")
     parser.add_argument('--env', type=str, default='BipedalWalker-v2',help="OpenAI Gym Environment")
     parser.add_argument('--gpu', type=int, default=0, help='GPU ID')
     parser.set_defaults(render=False)
     return parser.parse_args(args)
+
+def gather_stats(agent, env):
+    """ Compute average rewards over 10 episodes
+    """
+    score = []
+    for k in range(10):
+        old_state = env.reset()
+        cumul_r, done = 0, False
+        while not done:
+            a = agent.get_action(old_state)
+            old_state, r, done, _ = env.step(a)
+            cumul_r += r
+        score.append(cumul_r)
+    return np.mean(np.array(score)), np.std(np.array(score))
 
 def main(args=None):
 
@@ -55,11 +75,13 @@ def main(args=None):
     summary_writer = tf.summary.FileWriter("./tensorboard_" + args.env)
 
     # Initialization
-    env = gym.make(args.env)
+    env = Environment(gym.make(args.env), args.consecutive_frames)
     env.reset()
-    env_dim = env.observation_space.shape
-    act_dim, act_range = 4, 1 #env.action_space.n
-    ddpg = DDPG(act_dim, env_dim, act_range)
+    state_dim = env.get_state_size()
+    #print(env.action_space)
+    act_dim, act_range = 2, 0.99 #env.action_space.n
+    ddpg = DDPG(act_dim, state_dim, act_range, args.consecutive_frames)
+    results = []
 
     # First, gather experience
     tqdm_e = tqdm(range(args.nb_episodes), desc='Score', leave=True, unit=" episodes")
@@ -86,10 +108,15 @@ def main(args=None):
             critic_target = ddpg.bellman(rewards, q_values, dones)
             # Train both networks on sampled batch, update target networks
             ddpg.train_and_update(states, actions, critic_target)
+            # Gather stats every episode for plotting
+            if(args.gather_stats):
+                mean, stdev = gather_stats(ddpg, env)
+                results.append([e, mean, stdev])
             # Update current state
             old_state = new_state
             cumul_reward += r
             time += 1
+
 
         # Export results for Tensorboard
         score = tfSummary('score', cumul_reward)
@@ -98,6 +125,19 @@ def main(args=None):
         # Display score
         tqdm_e.set_description("Score: " + str(cumul_reward))
         tqdm_e.refresh()
+
+    # Export results to CSV
+    if(args.gather_stats):
+        df = pd.DataFrame(np.array(results))
+        df.to_csv("logs.csv", header=['Episode', 'Mean', 'Stddev'], float_format='%10.5f')
+
+    # Display agent
+    while True:
+        env.render()
+        a = ddpg.get_action(old_state)
+        old_state, r, done, _ = env.step(a)
+        time += 1
+        if done: env.reset()
 
 if __name__ == "__main__":
     main()
