@@ -2,6 +2,7 @@ import numpy as np
 import tensorflow as tf
 import keras.backend as K
 
+from keras.regularizers import l2
 from keras.models import Model, load_model
 from keras.layers import Input, Dense, Reshape, LSTM, Lambda, BatchNormalization, GaussianNoise, Flatten
 
@@ -27,13 +28,13 @@ class Actor:
         inp = Input((self.env_dim))
         #
         x = Dense(128, activation='relu')(inp)
-        x = GaussianNoise(1.0)(x)
-        x = BatchNormalization()(x)
+        x = GaussianNoise(0.05)(x)
+        # x = BatchNormalization()(x)
         #
         x = Flatten()(x)
         x = Dense(128, activation='relu')(x)
-        x = GaussianNoise(1.0)(x)
-        x = BatchNormalization()(x)
+        x = GaussianNoise(0.05)(x)
+        # x = BatchNormalization()(x)
         #
         x = Reshape((1, 128))(x)
         x = LSTM(128)(x)

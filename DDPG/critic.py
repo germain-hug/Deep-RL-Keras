@@ -2,6 +2,7 @@ import numpy as np
 import tensorflow as tf
 import keras.backend as K
 
+from keras.regularizers import l2
 from keras.models import Model, load_model
 from keras.optimizers import Adam
 from keras.layers import Input, Dense, concatenate, LSTM, Reshape, Lambda, Flatten
@@ -28,12 +29,12 @@ class Critic:
         """
         state = Input((self.env_dim))
         action = Input((self.act_dim,))
-        x1 = Dense(128, activation='relu')(state)
-        x2 = Dense(128, activation='relu')(action)
+        x1 = Dense(128, activation='linear')(state)
+        x2 = Dense(128, activation='linear')(action)
         x = concatenate([Flatten()(x1), x2])
-        x = Dense(128, activation='relu')(x)
-        x = Reshape((1, (128)))(x)
-        x = LSTM(256)(x)
+        x = Dense(256, activation='relu')(x)
+        x = Reshape((1, (256)))(x)
+        x = LSTM(128)(x)
         out = Dense(1, activation='linear')(x)
         return Model([state, action], out)
 

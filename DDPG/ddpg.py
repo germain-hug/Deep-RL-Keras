@@ -8,7 +8,7 @@ class DDPG:
     """ Deep Deterministic Policy Gradient (DDPG) Helper Class
     """
 
-    def __init__(self, act_dim, env_dim, act_range, k, buffer_size = 200000, gamma = 0.99, lr = 0.001, tau = 0.01):
+    def __init__(self, act_dim, env_dim, act_range, k, buffer_size = 200000, gamma = 0.99, lr = 0.001, tau = 0.001):
         """ Initialization
         """
         # Environment and A2C parameters
@@ -16,7 +16,7 @@ class DDPG:
         self.env_dim = (k,) + env_dim
         self.gamma = gamma
         # Create actor and critic networks
-        self.actor = Actor(self.env_dim, act_dim, act_range, 0.1*lr, tau)
+        self.actor = Actor(self.env_dim, act_dim, act_range, 0.1 * lr, tau)
         self.critic = Critic(self.env_dim, act_dim, lr, tau)
         self.buffer = MemoryBuffer(buffer_size)
 

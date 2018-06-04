@@ -39,7 +39,7 @@ def parse_args(args):
     #
     parser.add_argument('--nb_episodes', type=int, default=5000, help="Number of training episodes")
     parser.add_argument('--batch_size', type=int, default=64, help="Batch size (experience replay)")
-    parser.add_argument('--consecutive_frames', type=int, default=3, help="Number of consecutive frames (action repeat)")
+    parser.add_argument('--consecutive_frames', type=int, default=8, help="Number of consecutive frames (action repeat)")
     parser.add_argument('--gather_stats', dest='gather_stats', action='store_true',help="Compute Average reward per episode (slower)")
     parser.add_argument('--render', dest='render', action='store_true', help="Render environment")
     parser.add_argument('--env', type=str, default='BipedalWalker-v2',help="OpenAI Gym Environment")
