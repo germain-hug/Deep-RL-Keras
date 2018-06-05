@@ -37,7 +37,7 @@ python3 A2C/main.py --env CartPole-v1 --nb_episodes 10000 --render
 In a similar fashion as the A2C algorithm, the implementation of A3C incorporates asynchronous weight updates, allowing for much faster computation. We use multiple agents to perform gradient ascent asynchronously, over multiple threads.
 
 ```bash
-python3 A3C/main.py --env CartPole-v1 --nb_episodes 10000 --n_threads 16
+python3 A3C/main.py --env CartPole-v1 --nb_episodes 1000 --n_threads 16
 ```
 
 ## Deep Deterministic Policy Gradient (DDPG)
