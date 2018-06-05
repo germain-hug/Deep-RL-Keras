@@ -10,7 +10,7 @@ https://github.com/ShanHaoYu/Deep-Q-Network-Breakout/blob/master/environment.py
 class AtariEnvironment(object):
     def __init__(self, args, test=False):
         clip_rewards = not test
-        self.env = make_wrap_atari(args.env, clip_rewards, args.consecutive_frames)
+        self.env = make_wrap_atari(args.env, args.consecutive_frames, clip_rewards)
         self.action_space = self.env.action_space
         self.observation_space = self.env.observation_space
         self.consecutive_frames = args.consecutive_frames
@@ -32,7 +32,6 @@ class AtariEnvironment(object):
                 current RGB screen of game, shape: (210, 160, 3)
         '''
         observation = self.env.reset()
-        print(np.array(observation).shape)
         return np.array(observation)
 
 
