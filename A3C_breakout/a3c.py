@@ -1,10 +1,14 @@
+import sys
 import numpy as np
 
 from keras.models import Model
 from keras import regularizers
-from keras.layers import Input, Dense, Conv2D, MaxPooling2D, Flatten
+from keras.layers import Input, Dense, Flatten
 from critic import Critic
 from actor import Actor
+
+sys.path.append('../utils/')
+from networks import conv_block
 
 class A3C:
     """ Asynchronous Actor-Critic Main Algorithm
@@ -32,25 +36,14 @@ class A3C:
         inp = Input((self.env_dim))
         # If we have an image, apply convolutional layers
         if(len(self.env_dim) > 2):
-            x = self.conv_block(inp, 32, (2, 2))
-            x = self.conv_block(x, 32, (2, 2))
+            x = conv_block(inp, 32, (2, 2))
+            x = conv_block(x, 32, (2, 2))
             x = Flatten()(x)
         else:
             x = Dense(64, activation='relu')(inp)
             x = Dense(128, activation='relu')(x)
         return Model(inp, x)
 
-    def conv_layer(self, d):
-        """ Returns a 2D Conv layer, with L2-regularization and ReLU activation
-        """
-        return Conv2D(d, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal')
-
-    def conv_block(self, inp, d, pool_size=(2, 2)):
-        """ Returns a 2D Conv block, with a convolutional layer, max-pooling,
-        dropout and batch-normalization
-        """
-        conv = self.conv_layer(d)(inp)
-        return MaxPooling2D(pool_size=pool_size)(conv)
 
     def policy_action(self, s):
         """ Use the actor's target network to predict the next action to take, using the policy

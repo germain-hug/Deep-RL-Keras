@@ -13,17 +13,8 @@ from tqdm import tqdm
 from keras.backend.tensorflow_backend import set_session
 from keras.utils import to_categorical
 
-def get_session():
-    """ Limit session memory usage
-    """
-    config = tf.ConfigProto()
-    config.gpu_options.allow_growth = True
-    return tf.Session(config=config)
-
-def tfSummary(tag, val):
-    """ Scalar Value Tensorflow Summary
-    """
-    return tf.Summary(value=[tf.Summary.Value(tag=tag, simple_value=val)])
+sys.path.append('../utils/')
+from networks import get_session, tfSummary
 
 def parse_args(args):
     """ Parse arguments from command line input

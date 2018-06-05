@@ -37,9 +37,9 @@ class MemoryBuffer(object):
         a_batch = np.array([i[1] for i in batch])
         r_batch = np.array([i[2] for i in batch])
         d_batch = np.array([i[3] for i in batch])
-        s2_batch = np.array([i[4] for i in batch])
+        new_s_batch = np.array([i[4] for i in batch])
 
-        return s_batch, a_batch, r_batch, d_batch, s2_batch
+        return s_batch, a_batch, r_batch, d_batch, new_s_batch
 
     def clear(self):
         self.buffer = deque()

@@ -17,23 +17,12 @@ from keras.utils import to_categorical
 from keras import backend as K
 
 sys.path.append('../utils/')
-from AtariEnvironment import AtariEnvironment
+from atari_environment import AtariEnvironment
+from networks import get_session, tfSummary
 
 episode = 0
 gym.logger.set_level(40)
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
-
-def get_session():
-    """ Limit session memory usage
-    """
-    config = tf.ConfigProto()
-    config.gpu_options.allow_growth = True
-    return tf.InteractiveSession(config=config)
-
-def tfSummary(tag, val):
-    """ Scalar Value Tensorflow Summary
-    """
-    return tf.Summary(value=[tf.Summary.Value(tag=tag, simple_value=val)])
 
 def parse_args(args):
     """ Parse arguments from command line input
@@ -58,7 +47,7 @@ def training_thread(agent, Nmax, env, action_dim, k, f, summary_writer, tqdm, fa
 
         # Reset episode
         time, cumul_reward, done = 0, 0, False
-        old_state = env.get_initial_state()
+        old_state = env.reset()
         actions, states, rewards = [], [], []
         while not done:
             # Actor picks an action (following the policy)
