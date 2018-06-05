@@ -29,11 +29,11 @@ def parse_args(args):
     """
     parser = argparse.ArgumentParser(description='Training parameters')
     #
-    parser.add_argument('--n_threads', type=int, default=4, help="Number of threads")
+    parser.add_argument('--n_threads', type=int, default=8, help="Number of threads")
     parser.add_argument('--nb_episodes', type=int, default=5000, help="Number of training episodes")
     parser.add_argument('--consecutive_frames', type=int, default=4, help="Number of consecutive frames (action repeat)")
     parser.add_argument('--training_interval', type=int, default=30, help="Network training frequency")
-    parser.add_argument('--env', type=str, default='Breakout-v0',help="OpenAI Gym Environment")
+    parser.add_argument('--env', type=str, default='BreakoutNoFrameskip-v4',help="OpenAI Gym Environment")
     parser.add_argument('--gpu', type=int, default=0, help='GPU ID')
     parser.set_defaults(render=False)
     return parser.parse_args(args)
@@ -90,7 +90,7 @@ def main(args=None):
     summary_writer = tf.summary.FileWriter("./tensorboard_" + args.env)
 
     # Use AtariEnvironment Helper Class
-    envs = [AtariEnvironment(gym.make(args.env), args.consecutive_frames) for i in range(args.n_threads)]
+    envs = [AtariEnvironment(args) for i in range(args.n_threads)]
     state_dim = envs[0].get_state_size()
     action_dim = envs[0].get_action_size()
 

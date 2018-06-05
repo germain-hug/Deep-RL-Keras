@@ -3,7 +3,8 @@ import numpy as np
 from collections import deque
 
 class Environment(object):
-    """ Environment Helper Class (Multiple State Buffer)
+    """ Environment Helper Class (Multiple State Buffer) for Continuous Action Environments
+    (MountainCarContinuous-v0, LunarLanderContinuous-v2, etc..)
     """
     def __init__(self, gym_env, action_repeat):
         self.env = gym_env
@@ -18,7 +19,7 @@ class Environment(object):
         return self.env.observation_space.shape
 
     def reset(self):
-        """ Resets the atari game, clears the state buffer.
+        """ Resets the game, clears the state buffer.
         """
         # Clear the state buffer
         self.state_buffer = deque()
@@ -38,3 +39,6 @@ class Environment(object):
         self.state_buffer.popleft()
         self.state_buffer.append(x_t1)
         return s_t1, r_t, terminal, info
+
+    def render(self):
+        return self.env.render()
