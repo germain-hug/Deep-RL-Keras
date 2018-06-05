@@ -1,7 +1,10 @@
+import sys
 import numpy as np
 
 from actor import Actor
 from critic import Critic
+
+sys.path.append('../utils/')
 from memory_buffer import MemoryBuffer
 
 class DDPG:

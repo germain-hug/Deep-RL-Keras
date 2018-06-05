@@ -6,8 +6,6 @@ from collections import deque
 class MemoryBuffer(object):
     """ Memory Buffer Helper class for Experience Replay
     using a double-ended queue
-
-    (Thanks to Patrick Emami for template implementation)
     """
     def __init__(self, buffer_size):
         self.count = 0

@@ -5,7 +5,7 @@ Implementation of various Deep Reinforcement Learning algorithms:
 - [x] Synchronous N-step Advantage Actor Critic ([A2C](https://github.com/germain-hug/Advanced-Deep-RL-Keras#n-step-advantage-actor-critic-a2c))
 - [x] Asynchronous N-step Advantage Actor-Critic ([A3C](https://github.com/germain-hug/Advanced-Deep-RL-Keras#n-step-asynchronous-advantage-actor-critic-a3c))
 - [ ] Deep Deterministic Policy Gradient with Parameter Noise ([DDPG](https://github.com/germain-hug/Advanced-Deep-RL-Keras#deep-deterministic-policy-gradient-ddpg))
-- [ ] Deep Deterministic Policy Gradient with Hindsight Experience Replay ([DDPG + HER]()
+- [ ] Deep Deterministic Policy Gradient with Hindsight Experience Replay ([DDPG + HER](https://github.com/germain-hug/Advanced-Deep-RL-Keras#deep-deterministic-policy-gradient-with-hindsight-experience-replay-ddpg--her))
 - [ ] REINFORCE
 - [ ] Deep Q-Learning (DQN)
 - [ ] Dueling DQN (DDQN)
@@ -55,9 +55,11 @@ Hindsight Experience Replay (HER) brings an improvement to both discrete and con
 
 # Acknowledgments
 
+- Memory Buffer template by [Patrick Emami](http://pemami4911.github.io/)
+
 # References (Papers)
 
 - [Advantage Actor Critic (A2C)](https://papers.nips.cc/paper/1786-actor-critic-algorithms.pdf)
 - [Asynchronous Advantage Actor Critic (A3C)](https://arxiv.org/pdf/1602.01783.pdf)
 - [Deep Deterministic Policy Gradient (DDPG)](http://proceedings.mlr.press/v32/silver14.pdf)
-- [Hindsight Experience Replay](https://arxiv.org/pdf/1707.01495.pdf)
+- [Hindsight Experience Replay (HER)](https://arxiv.org/pdf/1707.01495.pdf)
