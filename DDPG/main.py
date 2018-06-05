@@ -117,7 +117,6 @@ def main(args=None):
             cumul_reward += r
             time += 1
 
-
         # Export results for Tensorboard
         score = tfSummary('score', cumul_reward)
         summary_writer.add_summary(score, global_step=e)

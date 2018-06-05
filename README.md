@@ -5,6 +5,7 @@ Implementation of various Deep Reinforcement Learning algorithms:
 - [x] Synchronous N-step Advantage Actor Critic ([A2C](https://github.com/germain-hug/Advanced-Deep-RL-Keras#n-step-advantage-actor-critic-a2c))
 - [x] Asynchronous N-step Advantage Actor-Critic ([A3C](https://github.com/germain-hug/Advanced-Deep-RL-Keras#n-step-asynchronous-advantage-actor-critic-a3c))
 - [ ] Deep Deterministic Policy Gradient with Parameter Noise ([DDPG](https://github.com/germain-hug/Advanced-Deep-RL-Keras#deep-deterministic-policy-gradient-ddpg))
+- [ ] Deep Deterministic Policy Gradient with Hindsight Experience Replay ([DDPG + HER]()
 - [ ] REINFORCE
 - [ ] Deep Q-Learning (DQN)
 - [ ] Dueling DQN (DDQN)
@@ -47,12 +48,16 @@ The DDPG algorithm is a model-free, off-policy algorithm for continuous control.
 python3 DDPG/main.py --nb_episodes 1000 --n_threads 16
 ```
 
+## Deep Deterministic Policy Gradient with Hindsight Experience Replay (DDPG + HER)
+Hindsight Experience Replay (HER) brings an improvement to both discrete and continuous action space off-policy methods. It is particularly suited for robotics application as it enables efficient learning from _sparse_ and _binary_ rewards. HER formulates the problem as a multi-goal task, where new goals are being sampled at the start of each episode through a specific strategy.
+
 # Visualization
 
 # Acknowledgments
 
-# References
+# References (Papers)
 
-- _Advantage Actor Critic (A2C)_ : [[paper]](https://papers.nips.cc/paper/1786-actor-critic-algorithms.pdf)
-- _Asynchronous Advantage Actor Critic (A3C)_ : [[paper]](https://arxiv.org/pdf/1602.01783.pdf)
-- _Deep Deterministic Policy Gradient (DDPG)_ : [[paper]](http://proceedings.mlr.press/v32/silver14.pdf)
+- [Advantage Actor Critic (A2C)](https://papers.nips.cc/paper/1786-actor-critic-algorithms.pdf)
+- [Asynchronous Advantage Actor Critic (A3C)](https://arxiv.org/pdf/1602.01783.pdf)
+- [Deep Deterministic Policy Gradient (DDPG)](http://proceedings.mlr.press/v32/silver14.pdf)
+- [Hindsight Experience Replay](https://arxiv.org/pdf/1707.01495.pdf)
