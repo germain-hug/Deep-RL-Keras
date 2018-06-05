@@ -70,3 +70,6 @@ class AtariEnvironment(object):
 
     def get_random_action(self):
         return self.action_space.sample()
+
+    def render(self):
+        return self.env.render()
