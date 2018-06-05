@@ -63,7 +63,7 @@ class AtariEnvironment(object):
         return np.array(observation), reward, done, info
 
     def get_action_size(self):
-        return self.env.action_space
+        return self.env.action_space.n
 
     def get_state_size(self):
         return 84, 84, self.consecutive_frames
