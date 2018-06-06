@@ -12,7 +12,7 @@ class DQN:
     """ Deep Q-Learning Main Algorithm
     """
 
-    def __init__(self, action_dim, state_dim, gamma = 0.99, epsilon = 1.0, epsilon_decay = 0.99, buffer_size = 200000, lr = 0.0001):
+    def __init__(self, action_dim, state_dim, gamma = 0.99, epsilon = 0.25, epsilon_decay = 0.99, buffer_size = 1000000, lr = 0.00001, tau = 0.01):
         """ Initialization
         """
         # Environment and DQN parameters
@@ -22,12 +22,12 @@ class DQN:
         self.epsilon = epsilon
         self.epsilon_decay = epsilon_decay
         # Create actor and critic networks
-        self.agent = Agent(state_dim, action_dim, lr)
+        self.agent = Agent(state_dim, action_dim, lr, tau)
         # Memory Buffer for Experience Replay
         self.buffer = MemoryBuffer(buffer_size)
 
     def policy_action(self, s):
-        """ Apply an espilon-greedy policy
+        """ Apply an espilon-greedy policy to pick next action
         """
         if random() <= self.epsilon:
             return randrange(self.action_dim)
@@ -35,6 +35,8 @@ class DQN:
             return np.argmax(self.agent.predict(s)[0])
 
     def train(self, batch_size):
+        """ Train on a batch sampled from the buffer
+        """
         # Sample experience from memory buffer
         s, a, r, d, new_s = self.buffer.sample_batch(batch_size)
         # Apply Bellman Equation to train our DQN

@@ -3,7 +3,9 @@ import numpy as np
 from atari_wrappers import make_wrap_atari
 
 """
-Original Code from
+Atari Environment Helper Class
+------
+Original Code by
 https://github.com/ShanHaoYu/Deep-Q-Network-Breakout/blob/master/environment.py
 """
 
