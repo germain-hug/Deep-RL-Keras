@@ -1,17 +1,18 @@
 import sys
 import numpy as np
 
-from actor import Actor
-from critic import Critic
-
-sys.path.append('../utils/')
-from memory_buffer import MemoryBuffer
+from tqdm import tqdm
+from .actor import Actor
+from .critic import Critic
+from utils.stats import gather_stats
+from utils.networks import tfSummary
+from utils.memory_buffer import MemoryBuffer
 
 class DDPG:
     """ Deep Deterministic Policy Gradient (DDPG) Helper Class
     """
 
-    def __init__(self, act_dim, env_dim, act_range, k, buffer_size = 200000, gamma = 0.99, lr = 0.001, tau = 0.001):
+    def __init__(self, act_dim, env_dim, k, buffer_size = 200000, gamma = 0.99, lr = 0.001, tau = 0.001):
         """ Initialization
         """
         # Environment and A2C parameters
@@ -19,11 +20,11 @@ class DDPG:
         self.env_dim = (k,) + env_dim
         self.gamma = gamma
         # Create actor and critic networks
-        self.actor = Actor(self.env_dim, act_dim, act_range, 0.1 * lr, tau)
+        self.actor = Actor(self.env_dim, act_dim, 0.1 * lr, tau)
         self.critic = Critic(self.env_dim, act_dim, lr, tau)
         self.buffer = MemoryBuffer(buffer_size)
 
-    def get_action(self, s):
+    def policy_action(self, s):
         """ Use the actor to predict value
         """
         return self.actor.predict(s)[0]
@@ -54,7 +55,7 @@ class DDPG:
     def sample_batch(self, batch_size):
         return self.buffer.sample_batch(batch_size)
 
-    def train_and_update(self, states, actions, critic_target):
+    def update_models(self, states, actions, critic_target):
         """ Update actor and critic networks from sampled experience
         """
         # Train critic
@@ -67,3 +68,51 @@ class DDPG:
         # Transfer weights to target networks at rate Tau
         self.actor.transfer_weights()
         self.critic.transfer_weights()
+
+
+    def train(self, env, args, summary_writer):
+        results = []
+
+        # First, gather experience
+        tqdm_e = tqdm(range(args.nb_episodes), desc='Score', leave=True, unit=" episodes")
+        for e in tqdm_e:
+
+            # Reset episode
+            time, cumul_reward, done = 0, 0, False
+            old_state = env.reset()
+            actions, states, rewards = [], [], []
+
+            while not done:
+                if args.render: env.render()
+                # Actor picks an action (following the deterministic policy)
+                a = self.policy_action(old_state)
+                # Retrieve new state, reward, and whether the state is terminal
+                new_state, r, done, _ = env.step(a)
+                # Add outputs to memory buffer
+                self.memorize(old_state, a, r, done, new_state)
+                # Sample experience from buffer
+                states, actions, rewards, dones, new_states = self.sample_batch(args.batch_size)
+                # Predict target q-values using target networks
+                q_values = self.target_critic_predict(new_states, self.target_actor_predict(new_states))
+                # Compute critic target
+                critic_target = self.bellman(rewards, q_values, dones)
+                # Train both networks on sampled batch, update target networks
+                self.update_models(states, actions, critic_target)
+                # Gather stats every episode for plotting
+                if(args.gather_stats):
+                    mean, stdev = gather_stats(self, env)
+                    results.append([e, mean, stdev])
+                # Update current state
+                old_state = new_state
+                cumul_reward += r
+                time += 1
+
+            # Export results for Tensorboard
+            score = tfSummary('score', cumul_reward)
+            summary_writer.add_summary(score, global_step=e)
+            summary_writer.flush()
+            # Display score
+            tqdm_e.set_description("Score: " + str(cumul_reward))
+            tqdm_e.refresh()
+
+        return results

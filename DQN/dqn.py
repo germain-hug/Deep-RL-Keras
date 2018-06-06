@@ -87,7 +87,7 @@ class DQN:
                 self.train_agent(args.batch_size)
 
             # Gather stats every 50 episode for plotting
-            if(e%50==0):
+            if(e%50==0 and args.gather_stats):
                 mean, stdev = gather_stats(self, env)
                 results.append([e, mean, stdev])
 

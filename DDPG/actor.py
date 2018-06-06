@@ -10,10 +10,9 @@ class Actor:
     """ Actor Network for the DDPG Algorithm
     """
 
-    def __init__(self, inp_dim, out_dim, act_range, lr, tau):
+    def __init__(self, inp_dim, out_dim, lr, tau):
         self.env_dim = inp_dim
         self.act_dim = out_dim
-        self.act_range = act_range
         self.tau = tau
         self.lr = lr
         self.model = self.network()
@@ -38,9 +37,8 @@ class Actor:
         #
         x = Reshape((1, 128))(x)
         x = LSTM(128)(x)
-        x = Dense(self.act_dim, activation='tanh')(x)
+        out = Dense(self.act_dim, activation='tanh')(x)
         #
-        out = Lambda(lambda i: i * self.act_range)(x)
         return Model(inp, out)
 
     def predict(self, state):

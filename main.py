@@ -9,14 +9,16 @@ import numpy as np
 import pandas as pd
 import tensorflow as tf
 
-from DQN.dqn import DQN
 from A2C.a2c import A2C
 from A3C.a3c import A3C
+from DQN.dqn import DQN
+from DDPG.ddpg import DDPG
 
 from keras.backend.tensorflow_backend import set_session
 from keras.utils import to_categorical
 
 from utils.atari_environment import AtariEnvironment
+from utils.continuous_environments import Environment
 from utils.networks import get_session
 
 gym.logger.set_level(40)
@@ -31,12 +33,13 @@ def parse_args(args):
     parser.add_argument('--is_atari', dest='is_atari', action='store_true', help="Atari Environment")
     #
     parser.add_argument('--nb_episodes', type=int, default=5000, help="Number of training episodes")
-    parser.add_argument('--render', dest='render', action='store_true', help="Render environment while training")
     parser.add_argument('--batch_size', type=int, default=64, help="Batch size (experience replay)")
     parser.add_argument('--consecutive_frames', type=int, default=4, help="Number of consecutive frames (action repeat)")
     parser.add_argument('--training_interval', type=int, default=30, help="Network training frequency")
     parser.add_argument('--n_threads', type=int, default=8, help="Number of threads (A3C)")
     #
+    parser.add_argument('--gather_stats', dest='gather_stats', action='store_true',help="Compute Average reward per episode (slower)")
+    parser.add_argument('--render', dest='render', action='store_true', help="Render environment while training")
     parser.add_argument('--env', type=str, default='BreakoutNoFrameskip-v4',help="OpenAI Gym Environment")
     parser.add_argument('--gpu', type=int, default=0, help='GPU ID')
     #
@@ -58,10 +61,18 @@ def main(args=None):
 
     # Environment Initialization
     if(args.is_atari):
+        # Atari Environment Wrapper
         env = AtariEnvironment(args)
         state_dim = env.get_state_size()
         action_dim = env.get_action_size()
+    elif(args.type=="DDPG"):
+        # Continuous Environments Wrapper
+        env = Environment(gym.make(args.env), args.consecutive_frames)
+        env.reset()
+        state_dim = env.get_state_size()
+        action_dim = 2
     else:
+        # Standard Environments
         env = gym.make(args.env)
         state_dim = env.observation_space.shape
         action_dim = env.action_space.n
@@ -73,13 +84,16 @@ def main(args=None):
         algo = A2C(action_dim, state_dim)
     elif(args.type=="A3C"):
         algo = A3C(action_dim, state_dim)
+    elif(args.type=="DDPG"):
+        algo = DDPG(action_dim, state_dim, args.consecutive_frames)
 
     # Train
     stats = algo.train(env, args, summary_writer)
 
     # Export results to CSV
-    df = pd.DataFrame(np.array(stats))
-    df.to_csv("logs.csv", header=['Episode', 'Mean', 'Stddev'], float_format='%10.5f')
+    if(args.gather_stats):
+        df = pd.DataFrame(np.array(stats))
+        df.to_csv("logs.csv", header=['Episode', 'Mean', 'Stddev'], float_format='%10.5f')
 
     # Display agent
     old_state, time = env.reset(), 0

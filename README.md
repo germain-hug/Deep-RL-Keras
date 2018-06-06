@@ -67,7 +67,7 @@ Using tensorboard, you can monitor the agent's score as it is training. When tra
 $ tensorboard --logdir=A2C/tensorboard_CartPole-v1/
 ```
 ### Results plotting
-After training, a log file is generated: `logs.csv`. Using [plotly](https://plot.ly/), you can visualize the average reward per episode.
+When training with the argument --gather_stats, a log file is generated: `logs.csv`. Using [plotly](https://plot.ly/), you can visualize the average reward per episode.
 To do so, you will first need to install plotly and get a [free licence](https://plot.ly/python/getting-started/).
 ```bash
 pip3 install plotly
