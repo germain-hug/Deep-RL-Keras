@@ -1,12 +1,16 @@
 import random
 import numpy as np
 
+from tqdm import tqdm
 from keras.models import Model
 from keras import regularizers
-from keras.layers import Input, Dense, Conv2D, MaxPooling2D, BatchNormalization, Flatten
+from keras.utils import to_categorical
+from keras.layers import Input, Dense
 
-from critic import Critic
-from actor import Actor
+from .critic import Critic
+from .actor import Actor
+from utils.networks import tfSummary
+from utils.stats import gather_stats
 
 class A2C:
     """ Actor-Critic Main Algorithm
@@ -49,7 +53,7 @@ class A2C:
             discounted_r[t] = cumul_r
         return discounted_r
 
-    def train(self, states, actions, rewards, done):
+    def train_models(self, states, actions, rewards, done):
         """ Update actor and critic networks from experience
         """
         # Compute discounted rewards and Advantage (TD. Error)
@@ -59,3 +63,52 @@ class A2C:
         # Networks optimization
         self.a_opt([states, actions, advantages])
         self.c_opt([states, discounted_rewards])
+
+    def train(self, env, args, summary_writer):
+        """ Main A2C Training Algorithm
+        """
+
+        results = []
+
+        # Main Loop
+        tqdm_e = tqdm(range(args.nb_episodes), desc='Score', leave=True, unit=" episodes")
+        for e in tqdm_e:
+
+            # Reset episode
+            time, cumul_reward, done = 0, 0, False
+            old_state = env.reset()
+            actions, states, rewards = [], [], []
+
+            while not done:
+                if args.render: env.render()
+                # Actor picks an action (following the policy)
+                a = self.policy_action(old_state)
+                # Retrieve new state, reward, and whether the state is terminal
+                new_state, r, done, _ = env.step(a)
+                # Memorize (s, a, r) for training
+                actions.append(to_categorical(a, self.act_dim))
+                rewards.append(r)
+                states.append(old_state)
+                # Update current state
+                old_state = new_state
+                cumul_reward += r
+                time += 1
+
+            # Train using discounted rewards ie. compute updates
+            self.train_models(states, actions, rewards, done)
+
+            # Gather stats every 50 episode for plotting
+            if(e%50==0):
+                mean, stdev = gather_stats(self, env)
+                results.append([e, mean, stdev])
+
+            # Export results for Tensorboard
+            score = tfSummary('score', cumul_reward)
+            summary_writer.add_summary(score, global_step=e)
+            summary_writer.flush()
+
+            # Display score
+            tqdm_e.set_description("Score: " + str(cumul_reward))
+            tqdm_e.refresh()
+
+        return results

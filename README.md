@@ -1,14 +1,14 @@
 # Advanced Deep RL in Keras
 
-Implementation of various Deep Reinforcement Learning algorithms:
+Modular Implementation of popular Deep Reinforcement Learning algorithms in Keras:
 
 - [x] Synchronous N-step Advantage Actor Critic ([A2C](https://github.com/germain-hug/Advanced-Deep-RL-Keras#n-step-advantage-actor-critic-a2c))
 - [x] Asynchronous N-step Advantage Actor-Critic ([A3C](https://github.com/germain-hug/Advanced-Deep-RL-Keras#n-step-asynchronous-advantage-actor-critic-a3c))
 - [ ] Deep Deterministic Policy Gradient with Parameter Noise ([DDPG](https://github.com/germain-hug/Advanced-Deep-RL-Keras#deep-deterministic-policy-gradient-ddpg))
 - [ ] Deep Deterministic Policy Gradient with Hindsight Experience Replay ([DDPG + HER](https://github.com/germain-hug/Advanced-Deep-RL-Keras#deep-deterministic-policy-gradient-with-hindsight-experience-replay-ddpg--her))
-- [ ] REINFORCE
 - [ ] Deep Q-Learning (DQN)
 - [ ] Dueling DQN (DDQN)
+- [ ] REINFORCE
 - [ ] Rainbow
 - [ ] Proximal Policy Optimization (PPO)
 - [ ] Impala
@@ -25,7 +25,7 @@ pip install gym keras==2.1.6
 The Actor-Critic algorithm is a model-free, off-policy method where the critic acts as a value-function approximator, and the actor as a policy-function approximator. When training, the critic predicts the TD-Error and guides the learning of both itself and the actor. In practice, we approximate the TD-Error using the Advantage function. For more stability, we use a shared computational backbone across both networks, as well as an N-step formulation of the discounted rewards. We also incorporate an entropy regularization term ("soft" learning) to encourage exploration. While A2C is simple and efficient, running it on Atari Games quickly becomes intractable due to long computation time. However, one can parallelize computation using multi-threaded agents, which is the point of A3C. We test A2C on the Cartpole-V1 environment.
 
 ```bash
-python3 A2C/main.py --env CartPole-v1 --nb_episodes 10000 --render
+$ python3 main.py --type A2C --env CartPole-v1
 ```
 <br />
 <div align="center">
@@ -38,18 +38,24 @@ python3 A2C/main.py --env CartPole-v1 --nb_episodes 10000 --render
 In a similar fashion as the A2C algorithm, the implementation of A3C incorporates asynchronous weight updates, allowing for much faster computation. We use multiple agents to perform gradient ascent asynchronously, over multiple threads. We test A3C on the Atari Breakout environment.
 
 ```bash
-python3 A3C/main.py --env CartPole-v1 --nb_episodes 1000 --n_threads 16
+$ python3 main.py --type A3C --env BreakoutNoFrameskip-v4 --is_atari --nb_episodes 10000 --n_threads 16
 ```
 
 ## Deep Deterministic Policy Gradient (DDPG)
 The DDPG algorithm is a model-free, off-policy algorithm for continuous action spaces. Similarly to A2C, it is an actor-critic algorithm in which the actor is trained on a deterministic target policy, and the critic predicts Q-Values. In order to reduce variance and increase stability, we use experience replay and separate target networks. Moreover, as hinted by [OpenAI](https://blog.openai.com/better-exploration-with-parameter-noise/), we encourage exploration through parameter space noise (as opposed to traditional action space noise). We test DDPG on the Lunar Lander environment.
 
 ```bash
-python3 DDPG/main.py --nb_episodes 1000 --n_threads 16
+$ python3 main.py --type DDPG --env LunarLanderContinuous-v2
 ```
 
 ## Deep Deterministic Policy Gradient with Hindsight Experience Replay (DDPG + HER)
 Hindsight Experience Replay (HER) brings an improvement to both discrete and continuous action space off-policy methods. It is particularly suited for robotics application as it enables efficient learning from _sparse_ and _binary_ rewards. HER formulates the problem as a multi-goal task, where new goals are being sampled at the start of each episode through a specific strategy.
+
+## Deep Q-Learning (DQN)
+
+```bash
+$ python3 main.py --type DQN --env BreakoutNoFrameskip-v4 --is_atari
+```
 
 # Visualization
 

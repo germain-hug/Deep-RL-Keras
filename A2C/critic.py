@@ -4,7 +4,7 @@ import keras.backend as K
 from keras.models import Model, load_model
 from keras.layers import Input, Dense, Flatten
 from keras.optimizers import Adam
-from agent import Agent
+from .agent import Agent
 
 class Critic(Agent):
     """ Critic for the A2C Algorithm
