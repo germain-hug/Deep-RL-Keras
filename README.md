@@ -14,7 +14,7 @@ Modular Implementation of popular Deep Reinforcement Learning algorithms in Kera
 - [ ] Impala
 - [ ] Spiral
 
-### Prerequisites
+### Getting Started
 
 This implementation requires keras 2.1.6, as well as OpenAI gym.
 ```
@@ -58,7 +58,28 @@ Hindsight Experience Replay (HER) brings an improvement to both discrete and con
 $ python3 main.py --type DQN --env BreakoutNoFrameskip-v4 --is_atari
 ```
 
-# Visualization
+# Visualization & Monitoring
+
+### Tensorboard monitoring
+Using tensorboard, you can monitor the agent's score as it is training. When training, a log folder with the name matching the chosen environment will be created. For example, to follow the A2C progression on CartPole-v1, simply run:
+```bash
+$ tensorboard --logdir=A2C/tensorboard_CartPole-v1/
+```
+### Results plotting
+After training, a log file is generated: `logs.csv`. Using [plotly](https://plot.ly/), you can visualize the average reward per episode.
+To do so, you will first need to install plotly and get a [free licence](https://plot.ly/python/getting-started/).
+```bash
+pip3 install plotly
+```
+To set up your credentials, run:
+```python
+import plotly
+plotly.tools.set_credentials_file(username='<your_username>', api_key='<your_key>')
+```
+Finally, to plot the results, run:
+```bash
+python3 utils/plot_results.py <path_to_your_log_file>
+```
 
 # Acknowledgments
 
