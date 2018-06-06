@@ -35,18 +35,24 @@ class DQN:
             return np.argmax(self.agent.predict(s)[0])
 
     def train(self, batch_size):
-        """ Train on a batch sampled from the buffer
+        """ Train on batch sampled from the buffer
         """
         # Sample experience from memory buffer
         s, a, r, d, new_s = self.buffer.sample_batch(batch_size)
-        # Apply Bellman Equation to train our DQN
+        # Apply Bellman Equation on batch samples to train our DQN
+        target = np.zeros((batch_size, self.action_dim))
         for i in range(s.shape[0]):
             new_r = r[i]
-            if not d[i]: new_r = (r[i] + self.gamma * np.amax(self.agent.predict(new_s[i])[0]))
-            target = self.agent.predict(s[i])
-            target[0][a[i]] = new_r
-            self.agent.fit(s[i], target)
+            if not d[i]: new_r = (r[i] + self.gamma * np.amax(self.agent.target_predict(new_s[i])[0]))
+            q_value = self.agent.predict(s[i])[0]
+            q_value[a[i]] = new_r
+            target[i, :] = q_value
+        # Train on batch
+        self.agent.fit(s, target)
+        # Decay epsilon
         self.epsilon *= self.epsilon_decay
+        # Transfer weights to target network
+        self.agent.transfer_weights()
 
     def memorize(self, state, action, reward, done, new_state):
         """ Store experience in memory buffer

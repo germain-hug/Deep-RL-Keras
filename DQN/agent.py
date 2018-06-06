@@ -50,9 +50,14 @@ class Agent:
         self.model.fit(self.reshape(inp), targ, epochs=1, verbose=0)
 
     def predict(self, inp):
-        """ Critic Value Prediction
+        """ Q-Value Prediction
         """
         return self.model.predict(self.reshape(inp))
+
+    def target_predict(self, inp):
+        """ Q-Value Prediction (using target network)
+        """
+        return self.target_model.predict(self.reshape(inp))
 
     def reshape(self, x):
         if len(x.shape) < 4: return np.expand_dims(x, axis=0)
