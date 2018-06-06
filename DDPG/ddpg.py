@@ -12,7 +12,7 @@ class DDPG:
     """ Deep Deterministic Policy Gradient (DDPG) Helper Class
     """
 
-    def __init__(self, act_dim, env_dim, k, buffer_size = 200000, gamma = 0.99, lr = 0.001, tau = 0.001):
+    def __init__(self, act_dim, env_dim, k, buffer_size = 200000, gamma = 0.99, lr = 0.0001, tau = 0.001):
         """ Initialization
         """
         # Environment and A2C parameters
@@ -69,7 +69,6 @@ class DDPG:
         self.actor.transfer_weights()
         self.critic.transfer_weights()
 
-
     def train(self, env, args, summary_writer):
         results = []
 
@@ -99,7 +98,7 @@ class DDPG:
                 # Train both networks on sampled batch, update target networks
                 self.update_models(states, actions, critic_target)
                 # Gather stats every episode for plotting
-                if(args.gather_stats):
+                if(e%50==0 and args.gather_stats):
                     mean, stdev = gather_stats(self, env)
                     results.append([e, mean, stdev])
                 # Update current state

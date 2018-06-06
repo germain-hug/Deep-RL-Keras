@@ -26,30 +26,32 @@ class Actor:
         """
         inp = Input((self.env_dim))
         #
-        x = Dense(128, activation='relu')(inp)
+        x = Dense(256, activation='relu', kernel_initializer='he_uniform')(inp)
         x = GaussianNoise(0.05)(x)
-        # x = BatchNormalization()(x)
+        x = BatchNormalization()(x)
         #
         x = Flatten()(x)
-        x = Dense(128, activation='relu')(x)
+        x = Dense(256, activation='relu', kernel_initializer='he_uniform')(x)
         x = GaussianNoise(0.05)(x)
-        # x = BatchNormalization()(x)
+        x = BatchNormalization()(x)
         #
-        x = Reshape((1, 128))(x)
-        x = LSTM(128)(x)
+        # x = Reshape((1, 256))(x)
+        # x = LSTM(128)(x)
+
         out = Dense(self.act_dim, activation='tanh')(x)
+        out = Lambda(lambda i: i * 3.0)(out)
         #
         return Model(inp, out)
 
     def predict(self, state):
         """ Action prediction
         """
-        return self.model.predict(np.expand_dims(state, axis=0))
+        return np.clip(self.model.predict(np.expand_dims(state, axis=0)), -3.0, 3.0)
 
     def target_predict(self, inp):
         """ Action prediction (target network)
         """
-        return self.target_model.predict(inp)
+        return np.clip(self.target_model.predict(inp), -3.0, 3.0)
 
     def transfer_weights(self):
         """ Transfer model weights to target model with a factor of Tau

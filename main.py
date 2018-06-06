@@ -57,7 +57,7 @@ def main(args=None):
     if args.gpu:
         os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu
     set_session(get_session())
-    summary_writer = tf.summary.FileWriter("./tensorboard_" + args.env)
+    summary_writer = tf.summary.FileWriter(args.type + "/tensorboard_" + args.env)
 
     # Environment Initialization
     if(args.is_atari):
@@ -70,7 +70,8 @@ def main(args=None):
         env = Environment(gym.make(args.env), args.consecutive_frames)
         env.reset()
         state_dim = env.get_state_size()
-        action_dim = 2
+        action_dim = 1
+        # print(gym.make(args.env).action_space.high, gym.make(args.env).action_space.low)
     else:
         # Standard Environments
         env = gym.make(args.env)

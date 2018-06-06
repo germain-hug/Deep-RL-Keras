@@ -5,7 +5,7 @@ import keras.backend as K
 from keras.regularizers import l2
 from keras.models import Model, load_model
 from keras.optimizers import Adam
-from keras.layers import Input, Dense, concatenate, LSTM, Reshape, Lambda, Flatten
+from keras.layers import Input, Dense, concatenate, LSTM, Reshape, BatchNormalization, Lambda, Flatten
 
 class Critic:
     """ Critic for the DDPG Algorithm, Q-Value function approximator
@@ -29,12 +29,15 @@ class Critic:
         """
         state = Input((self.env_dim))
         action = Input((self.act_dim,))
-        x1 = Dense(128, activation='linear')(state)
-        x2 = Dense(128, activation='linear')(action)
+        x1 = Dense(256, activation='linear', kernel_initializer='he_uniform')(state)
+        x1 = BatchNormalization()(x1)
+        x2 = Dense(256, activation='linear', kernel_initializer='he_uniform')(action)
+        x2 = BatchNormalization()(x2)
         x = concatenate([Flatten()(x1), x2])
-        x = Dense(256, activation='relu')(x)
-        x = Reshape((1, (256)))(x)
-        x = LSTM(128)(x)
+        x = Dense(256, activation='relu', kernel_initializer='he_uniform')(x)
+        x = BatchNormalization()(x)
+        # x = Reshape((1, (256)))(x)
+        # x = LSTM(128)(x)
         out = Dense(1, activation='linear')(x)
         return Model([state, action], out)
 
