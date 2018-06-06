@@ -8,8 +8,8 @@ Modular Implementation of popular Deep Reinforcement Learning algorithms in Kera
 - [ ] Deep Deterministic Policy Gradient with Hindsight Experience Replay ([DDPG + HER](https://github.com/germain-hug/Advanced-Deep-RL-Keras#deep-deterministic-policy-gradient-with-hindsight-experience-replay-ddpg--her))
 - [ ] Deep Q-Learning (DQN)
 - [ ] Dueling DQN (DDQN)
-- [ ] REINFORCE
 - [ ] Rainbow
+- [ ] REINFORCE
 - [ ] Proximal Policy Optimization (PPO)
 - [ ] Impala
 - [ ] Spiral
@@ -56,6 +56,7 @@ Hindsight Experience Replay (HER) brings an improvement to both discrete and con
 
 ```bash
 $ python3 main.py --type DQN --env BreakoutNoFrameskip-v4 --is_atari
+$ python3 main.py --type DQN --env CartPole-v1 --batch_size 512
 ```
 
 # Visualization & Monitoring
