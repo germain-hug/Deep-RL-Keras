@@ -39,6 +39,7 @@ In a similar fashion as the A2C algorithm, the implementation of A3C incorporate
 
 ```bash
 $ python3 main.py --type A3C --env BreakoutNoFrameskip-v4 --is_atari --nb_episodes 10000 --n_threads 16
+$ python3 main.py --type A3C --env CartPole-v1 --nb_episodes 10000 --n_threads 16
 ```
 
 ## Deep Deterministic Policy Gradient (DDPG)

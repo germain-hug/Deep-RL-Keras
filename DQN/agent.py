@@ -27,11 +27,15 @@ class Agent:
         """ Build Deep Q-Network
         """
         inp = Input((self.state_dim))
-        x = conv_block(inp, 32, (4, 4), 8)
-        x = conv_block(x, 64, (2, 2), 4)
-        x = Flatten()(x)
-        x = Dense(256, activation='relu')(x)
-        x = Dense(self.action_dim, activation='sigmoid')(x)
+        if(len(self.state_dim) > 2):
+            x = conv_block(inp, 32, (4, 4), 8)
+            x = conv_block(x, 64, (2, 2), 4)
+            x = Flatten()(x)
+            x = Dense(256, activation='relu')(x)
+            x = Dense(self.action_dim, activation='sigmoid')(x)
+        else:
+            x = Dense(64, activation='relu')(inp)
+            x = Dense(128, activation='relu')(x)
         return Model(inp, x)
 
     def transfer_weights(self):
@@ -59,5 +63,6 @@ class Agent:
         return self.target_model.predict(self.reshape(inp))
 
     def reshape(self, x):
-        if len(x.shape) < 4: return np.expand_dims(x, axis=0)
+        if len(x.shape) < 4 and len(self.state_dim) > 2: return np.expand_dims(x, axis=0)
+        elif len(x.shape) < 2: return np.expand_dims(x, axis=0)
         else: return x
