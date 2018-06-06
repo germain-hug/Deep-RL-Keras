@@ -32,10 +32,10 @@ class Agent:
             x = conv_block(x, 64, (2, 2), 4)
             x = Flatten()(x)
             x = Dense(256, activation='relu')(x)
-            x = Dense(self.action_dim, activation='sigmoid')(x)
         else:
-            x = Dense(64, activation='relu')(inp)
-            x = Dense(128, activation='relu')(x)
+            x = Dense(64, activation='relu', kernel_initializer='he_uniform')(inp)
+            x = Dense(128, activation='relu', kernel_initializer='he_uniform')(x)
+        x = Dense(self.action_dim, activation='linear')(x)
         return Model(inp, x)
 
     def transfer_weights(self):
