@@ -4,18 +4,20 @@ import keras.backend as K
 from keras.models import Model, load_model
 from keras.layers import Input, Dense, Flatten
 from keras.optimizers import Adam
-from agent import Agent
+from .agent import Agent
 
 class Critic(Agent):
     """ Critic for the A3C Algorithm
     """
 
-    def __init__(self, inp_dim, out_dim, network, lr):
+    def __init__(self, inp_dim, out_dim, network, network_tgt, lr):
         Agent.__init__(self, inp_dim, out_dim, lr)
         self.model = self.addHead(network)
+        self.target_model = self.addHead(network_tgt)
         self.discounted_r = K.placeholder(shape=(None,))
         # Pre-compile for threading
         self.model._make_predict_function()
+        self.target_model._make_predict_function()
 
     def addHead(self, network):
         """ Assemble Critic network to predict value of each state

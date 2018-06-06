@@ -4,19 +4,21 @@ import keras.backend as K
 from keras.models import Model, load_model
 from keras.layers import Input, Dense, Flatten
 from keras.optimizers import Adam
-from agent import Agent
+from .agent import Agent
 
 class Actor(Agent):
     """ Actor for the A2C Algorithm
     """
 
-    def __init__(self, inp_dim, out_dim, network, lr):
+    def __init__(self, inp_dim, out_dim, network, network_tgt, lr):
         Agent.__init__(self, inp_dim, out_dim, lr)
         self.model = self.addHead(network)
+        self.target_model = self.addHead(network_tgt)
         self.action_pl = K.placeholder(shape=(None, self.out_dim))
         self.advantages_pl = K.placeholder(shape=(None,))
         # Pre-compile for threading
         self.model._make_predict_function()
+        self.target_model._make_predict_function()
 
     def addHead(self, network):
         """ Assemble Actor network to predict probability of each action
@@ -32,7 +34,7 @@ class Actor(Agent):
         weighted_actions = K.sum(self.action_pl * self.model.output, axis=1)
         eligibility = K.log(weighted_actions + 1e-10) * K.stop_gradient(self.advantages_pl)
         entropy = K.sum(self.model.output * K.log(self.model.output + 1e-10), axis=1)
-        loss = 0.01 * entropy - K.sum(eligibility)
+        loss = 0.001 * entropy - K.sum(eligibility)
 
         updates = self.rms_optimizer.get_updates(self.model.trainable_weights, [], loss)
         return K.function([self.model.input, self.action_pl, self.advantages_pl], [], updates=updates)

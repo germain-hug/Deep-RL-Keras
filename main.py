@@ -1,6 +1,7 @@
 """ Deep Q-Learning for OpenAI Gym environment
 """
 
+import os
 import sys
 import gym
 import argparse
@@ -10,12 +11,16 @@ import tensorflow as tf
 
 from DQN.dqn import DQN
 from A2C.a2c import A2C
+from A3C.a3c import A3C
 
 from keras.backend.tensorflow_backend import set_session
 from keras.utils import to_categorical
 
 from utils.atari_environment import AtariEnvironment
 from utils.networks import get_session
+
+gym.logger.set_level(40)
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
 def parse_args(args):
     """ Parse arguments from command line input
@@ -29,6 +34,8 @@ def parse_args(args):
     parser.add_argument('--render', dest='render', action='store_true', help="Render environment while training")
     parser.add_argument('--batch_size', type=int, default=64, help="Batch size (experience replay)")
     parser.add_argument('--consecutive_frames', type=int, default=4, help="Number of consecutive frames (action repeat)")
+    parser.add_argument('--training_interval', type=int, default=30, help="Network training frequency")
+    parser.add_argument('--n_threads', type=int, default=8, help="Number of threads (A3C)")
     #
     parser.add_argument('--env', type=str, default='BreakoutNoFrameskip-v4',help="OpenAI Gym Environment")
     parser.add_argument('--gpu', type=int, default=0, help='GPU ID')
@@ -64,6 +71,8 @@ def main(args=None):
         algo = DQN(action_dim, state_dim)
     elif(args.type=="A2C"):
         algo = A2C(action_dim, state_dim)
+    elif(args.type=="A3C"):
+        algo = A3C(action_dim, state_dim)
 
     # Train
     stats = algo.train(env, args, summary_writer)
