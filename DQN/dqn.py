@@ -3,13 +3,12 @@ import random
 import numpy as np
 
 from tqdm import tqdm
-from agent import Agent
+from .agent import Agent
 from random import random, randrange
 
-sys.path.append('../utils/')
-from memory_buffer import MemoryBuffer
-from networks import tfSummary
-from stats import gather_stats
+from utils.memory_buffer import MemoryBuffer
+from utils.networks import tfSummary
+from utils.stats import gather_stats
 
 class DQN:
     """ Deep Q-Learning Main Algorithm
@@ -84,7 +83,8 @@ class DQN:
                 time += 1
 
             # Train DQN
-            self.train_agent(args.batch_size)
+            if(self.buffer.size() > args.batch_size):
+                self.train_agent(args.batch_size)
 
             # Gather stats every 50 episode for plotting
             if(e%50==0):

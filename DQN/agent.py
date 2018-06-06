@@ -5,8 +5,7 @@ from keras.models import Model
 from keras.optimizers import Adam
 from keras.layers import Input, Dense, Flatten
 
-sys.path.append('../utils/')
-from networks import conv_block
+from utils.networks import conv_block
 
 class Agent:
     """ Agent Class (Network) for DQN

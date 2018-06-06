@@ -1,6 +1,6 @@
 import gym
 import numpy as np
-from atari_wrappers import make_wrap_atari
+from .atari_wrappers import make_wrap_atari
 
 """
 Atari Environment Helper Class
