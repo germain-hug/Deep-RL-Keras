@@ -14,6 +14,12 @@ Modular Implementation of popular Deep Reinforcement Learning algorithms in Kera
 - [ ] Impala
 - [ ] Spiral
 
+<br />
+<div align="center">
+<img width="30%" src ="https://github.com/germain-hug/Advanced-Deep-RL-Keras/blob/master/A2C/results/a2c.gif?raw=true" />
+<p style="text-align=center";> Results [Cartpole-V1] </p></div>  
+<br />
+
 ### Getting Started
 
 This implementation requires keras 2.1.6, as well as OpenAI gym.
@@ -30,8 +36,7 @@ $ python3 main.py --type A2C --env CartPole-v1
 <br />
 <div align="center">
 <img width="40%" src ="https://github.com/germain-hug/Advanced-Deep-RL-Keras/blob/master/A2C/results/a2c.png?raw=true" />
-<img width="30%" src ="https://github.com/germain-hug/Advanced-Deep-RL-Keras/blob/master/A2C/results/a2c.gif?raw=true" />
-<p style="text-align=center";> A2C Average Score and Results [Cartpole-V1] </p></div>  
+<p style="text-align=center";> A2C Average Score [Cartpole-V1] </p></div>  
 <br />
 
 ## N-step Asynchronous Advantage Actor Critic (A3C)
