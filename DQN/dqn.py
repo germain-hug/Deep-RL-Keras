@@ -2,11 +2,14 @@ import sys
 import random
 import numpy as np
 
+from tqdm import tqdm
 from agent import Agent
 from random import random, randrange
 
 sys.path.append('../utils/')
 from memory_buffer import MemoryBuffer
+from networks import tfSummary
+from stats import gather_stats
 
 class DQN:
     """ Deep Q-Learning Main Algorithm
@@ -34,8 +37,8 @@ class DQN:
         else:
             return np.argmax(self.agent.predict(s)[0])
 
-    def train(self, batch_size):
-        """ Train on batch sampled from the buffer
+    def train_agent(self, batch_size):
+        """ Train Q-network on batch sampled from the buffer
         """
         # Sample experience from memory buffer
         s, a, r, d, new_s = self.buffer.sample_batch(batch_size)
@@ -53,6 +56,51 @@ class DQN:
         self.epsilon *= self.epsilon_decay
         # Transfer weights to target network
         self.agent.transfer_weights()
+
+    def train(self, env, args, summary_writer):
+        """ Main DQN Training Algorithm
+        """
+
+        results = []
+        tqdm_e = tqdm(range(args.nb_episodes), desc='Score', leave=True, unit=" episodes")
+
+        for e in tqdm_e:
+            # Reset episode
+            time, cumul_reward, done = 0, 0, False
+            old_state = env.reset()
+            actions, states, rewards = [], [], []
+
+            while not done:
+                if args.render: env.render()
+                # Actor picks an action (following the policy)
+                a = self.policy_action(old_state)
+                # Retrieve new state, reward, and whether the state is terminal
+                new_state, r, done, _ = env.step(a)
+                # Memorize for experience replay
+                self.memorize(old_state, a, r, done, new_state)
+                # Update current state
+                old_state = new_state
+                cumul_reward += r
+                time += 1
+
+            # Train DQN
+            self.train_agent(args.batch_size)
+
+            # Gather stats every 50 episode for plotting
+            if(e%50==0):
+                mean, stdev = gather_stats(self, env)
+                results.append([e, mean, stdev])
+
+            # Export results for Tensorboard
+            score = tfSummary('score', cumul_reward)
+            summary_writer.add_summary(score, global_step=e)
+            summary_writer.flush()
+
+            # Display score
+            tqdm_e.set_description("Score: " + str(cumul_reward))
+            tqdm_e.refresh()
+
+        return results
 
     def memorize(self, state, action, reward, done, new_state):
         """ Store experience in memory buffer

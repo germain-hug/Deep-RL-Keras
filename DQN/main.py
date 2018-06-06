@@ -9,13 +9,12 @@ import pandas as pd
 import tensorflow as tf
 
 from dqn import DQN
-from tqdm import tqdm
 from keras.backend.tensorflow_backend import set_session
 from keras.utils import to_categorical
 
 sys.path.append('../utils/')
 from atari_environment import AtariEnvironment
-from networks import get_session, tfSummary
+from networks import get_session
 
 def parse_args(args):
     """ Parse arguments from command line input
@@ -30,20 +29,6 @@ def parse_args(args):
     parser.add_argument('--gpu', type=int, default=0, help='GPU ID')
     parser.set_defaults(render=False)
     return parser.parse_args(args)
-
-def gather_stats(dqn, env):
-    """ Compute average rewards over 10 episodes
-    """
-    score = []
-    for k in range(10):
-        old_state = env.reset()
-        cumul_r, done = 0, False
-        while not done:
-            a = dqn.policy_action(old_state)
-            old_state, r, done, _ = env.step(a)
-            cumul_r += r
-        score.append(cumul_r)
-    return np.mean(np.array(score)), np.std(np.array(score))
 
 def main(args=None):
 
@@ -63,51 +48,16 @@ def main(args=None):
     state_dim = env.get_state_size()
     action_dim = env.get_action_size()
     dqn = DQN(action_dim, state_dim)
-    results = []
 
-    # Main Loop
-    tqdm_e = tqdm(range(args.nb_episodes), desc='Score', leave=True, unit=" episodes")
-    for e in tqdm_e:
-
-        # Reset episode
-        time, cumul_reward, done = 0, 0, False
-        old_state = env.reset()
-        actions, states, rewards = [], [], []
-
-        while not done:
-            if args.render: env.render()
-            # Actor picks an action (following the policy)
-            a = dqn.policy_action(old_state)
-            # Retrieve new state, reward, and whether the state is terminal
-            new_state, r, done, _ = env.step(a)
-            # Memorize for experience replay
-            dqn.memorize(old_state, a, r, done, new_state)
-            # Update current state
-            old_state = new_state
-            cumul_reward += r
-            time += 1
-
-        # Train DQN
-        dqn.train(args.batch_size)
-
-        # Gather stats every 50 episode for plotting
-        if(e%50==0):
-            mean, stdev = gather_stats(dqn, env)
-            results.append([e, mean, stdev])
-
-        # Export results for Tensorboard
-        score = tfSummary('score', cumul_reward)
-        summary_writer.add_summary(score, global_step=e)
-        summary_writer.flush()
-        # Display score
-        tqdm_e.set_description("Score: " + str(cumul_reward))
-        tqdm_e.refresh()
+    # Train
+    stats = dqn.train(env, args, summary_writer)
 
     # Export results to CSV
-    df = pd.DataFrame(np.array(results))
+    df = pd.DataFrame(np.array(stats))
     df.to_csv("logs.csv", header=['Episode', 'Mean', 'Stddev'], float_format='%10.5f')
 
     # Display agent
+    old_state = env.reset()
     while True:
         env.render()
         a = dqn.policy_action(old_state)
