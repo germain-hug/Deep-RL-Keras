@@ -14,7 +14,7 @@ class DQN:
     """ Deep Q-Learning Main Algorithm
     """
 
-    def __init__(self, action_dim, state_dim, gamma = 0.99, epsilon = 0.25, epsilon_decay = 0.99, buffer_size = 100000, lr = 0.001, tau = 0.01):
+    def __init__(self, action_dim, state_dim, gamma = 0.99, epsilon = 0.25, epsilon_decay = 0.99, buffer_size = 100000, lr = 0.001, tau = 0.1):
         """ Initialization
         """
         # Environment and DQN parameters

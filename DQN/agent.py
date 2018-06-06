@@ -35,7 +35,7 @@ class Agent:
         else:
             x = Dense(64, activation='relu', kernel_initializer='he_uniform')(inp)
             x = Dense(128, activation='relu', kernel_initializer='he_uniform')(x)
-        x = Dense(self.action_dim, activation='linear')(x)
+        x = Dense(self.action_dim, activation='linear', kernel_initializer='he_uniform')(x)
         return Model(inp, x)
 
     def transfer_weights(self):
