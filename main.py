@@ -95,7 +95,7 @@ def main(args=None):
     # Export results to CSV
     if(args.gather_stats):
         df = pd.DataFrame(np.array(stats))
-        df.to_csv("logs.csv", header=['Episode', 'Mean', 'Stddev'], float_format='%10.5f')
+        df.to_csv(args.type + "/logs.csv", header=['Episode', 'Mean', 'Stddev'], float_format='%10.5f')
 
     # Display agent
     old_state, time = env.reset(), 0
