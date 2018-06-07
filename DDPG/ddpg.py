@@ -12,15 +12,16 @@ class DDPG:
     """ Deep Deterministic Policy Gradient (DDPG) Helper Class
     """
 
-    def __init__(self, act_dim, env_dim, k, buffer_size = 200000, gamma = 0.99, lr = 0.0001, tau = 0.001):
+    def __init__(self, act_dim, env_dim, act_range, k, buffer_size = 200000, gamma = 0.99, lr = 0.0001, tau = 0.001):
         """ Initialization
         """
         # Environment and A2C parameters
         self.act_dim = act_dim
+        self.act_range = act_range
         self.env_dim = (k,) + env_dim
         self.gamma = gamma
         # Create actor and critic networks
-        self.actor = Actor(self.env_dim, act_dim, 0.1 * lr, tau)
+        self.actor = Actor(self.env_dim, act_dim, act_range, 0.1 * lr, tau)
         self.critic = Critic(self.env_dim, act_dim, lr, tau)
         self.buffer = MemoryBuffer(buffer_size)
 
@@ -80,11 +81,16 @@ class DDPG:
             time, cumul_reward, done = 0, 0, False
             old_state = env.reset()
             actions, states, rewards = [], [], []
+            ou_noise = np.ones((self.act_dim)) * 0.15
 
             while not done:
                 if args.render: env.render()
                 # Actor picks an action (following the deterministic policy)
                 a = self.policy_action(old_state)
+                # Clip continuous values to be valid w.r.t. environment
+                ou_noise = - 0.15 * ou_noise + 0.3 * np.random.randn(self.act_dim)
+                # a = a + 0.1 * ou_noise
+                a = np.clip(a, -self.act_range, self.act_range)
                 # Retrieve new state, reward, and whether the state is terminal
                 new_state, r, done, _ = env.step(a)
                 # Add outputs to memory buffer
@@ -97,14 +103,15 @@ class DDPG:
                 critic_target = self.bellman(rewards, q_values, dones)
                 # Train both networks on sampled batch, update target networks
                 self.update_models(states, actions, critic_target)
-                # Gather stats every episode for plotting
-                if(e%50==0 and args.gather_stats):
-                    mean, stdev = gather_stats(self, env)
-                    results.append([e, mean, stdev])
                 # Update current state
                 old_state = new_state
                 cumul_reward += r
                 time += 1
+
+            # Gather stats every episode for plotting
+            if(args.gather_stats):
+                mean, stdev = gather_stats(self, env)
+                results.append([e, mean, stdev])
 
             # Export results for Tensorboard
             score = tfSummary('score', cumul_reward)

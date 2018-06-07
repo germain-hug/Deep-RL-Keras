@@ -10,9 +10,10 @@ class Actor:
     """ Actor Network for the DDPG Algorithm
     """
 
-    def __init__(self, inp_dim, out_dim, lr, tau):
+    def __init__(self, inp_dim, out_dim, act_range, lr, tau):
         self.env_dim = inp_dim
         self.act_dim = out_dim
+        self.act_range = act_range
         self.tau = tau
         self.lr = lr
         self.model = self.network()
@@ -26,32 +27,28 @@ class Actor:
         """
         inp = Input((self.env_dim))
         #
-        x = Dense(256, activation='relu', kernel_initializer='he_uniform')(inp)
-        x = GaussianNoise(0.05)(x)
+        x = Dense(512, activation='relu', kernel_initializer='he_uniform')(inp)
+        x = GaussianNoise(0.01)(x)
         x = BatchNormalization()(x)
         #
         x = Flatten()(x)
         x = Dense(256, activation='relu', kernel_initializer='he_uniform')(x)
-        x = GaussianNoise(0.05)(x)
-        x = BatchNormalization()(x)
+        x = GaussianNoise(0.01)(x)
         #
-        # x = Reshape((1, 256))(x)
-        # x = LSTM(128)(x)
-
         out = Dense(self.act_dim, activation='tanh')(x)
-        out = Lambda(lambda i: i * 3.0)(out)
+        out = Lambda(lambda i: i * self.act_range)(out)
         #
         return Model(inp, out)
 
     def predict(self, state):
         """ Action prediction
         """
-        return np.clip(self.model.predict(np.expand_dims(state, axis=0)), -3.0, 3.0)
+        return self.model.predict(np.expand_dims(state, axis=0))
 
     def target_predict(self, inp):
         """ Action prediction (target network)
         """
-        return np.clip(self.target_model.predict(inp), -3.0, 3.0)
+        return self.target_model.predict(inp)
 
     def transfer_weights(self):
         """ Transfer model weights to target model with a factor of Tau

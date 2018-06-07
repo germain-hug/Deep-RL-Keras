@@ -34,10 +34,8 @@ class Critic:
         x2 = Dense(256, activation='linear', kernel_initializer='he_uniform')(action)
         x2 = BatchNormalization()(x2)
         x = concatenate([Flatten()(x1), x2])
-        x = Dense(256, activation='relu', kernel_initializer='he_uniform')(x)
+        x = Dense(128, activation='relu', kernel_initializer='he_uniform')(x)
         x = BatchNormalization()(x)
-        # x = Reshape((1, (256)))(x)
-        # x = LSTM(128)(x)
         out = Dense(1, activation='linear')(x)
         return Model([state, action], out)
 

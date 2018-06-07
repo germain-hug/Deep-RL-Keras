@@ -70,8 +70,9 @@ def main(args=None):
         env = Environment(gym.make(args.env), args.consecutive_frames)
         env.reset()
         state_dim = env.get_state_size()
-        action_dim = 1
-        # print(gym.make(args.env).action_space.high, gym.make(args.env).action_space.low)
+        action_space = gym.make(args.env).action_space
+        action_dim = action_space.high.shape[0]
+        act_range = action_space.high
     else:
         # Standard Environments
         env = gym.make(args.env)
@@ -86,7 +87,7 @@ def main(args=None):
     elif(args.type=="A3C"):
         algo = A3C(action_dim, state_dim)
     elif(args.type=="DDPG"):
-        algo = DDPG(action_dim, state_dim, args.consecutive_frames)
+        algo = DDPG(action_dim, state_dim, act_range, args.consecutive_frames)
 
     # Train
     stats = algo.train(env, args, summary_writer)
