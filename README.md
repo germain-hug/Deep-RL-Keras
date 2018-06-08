@@ -17,14 +17,14 @@ Modular Implementation of popular Deep Reinforcement Learning algorithms in Kera
 <br />
 <div align="center">
 <img width="30%" src ="https://github.com/germain-hug/Advanced-Deep-RL-Keras/blob/master/results/a2c.gif?raw=true" />
-<p style="text-align=center";> Results [Cartpole-V1] </p></div>  
+<p style="text-align=center";> Results </p></div>  
 <br />
 
-### Getting Started
+## Getting Started
 
 This implementation requires keras 2.1.6, as well as OpenAI gym.
-```
-pip install gym keras==2.1.6
+``` bash
+$ pip install gym keras==2.1.6
 ```
 
 ## N-step Advantage Actor Critic (A2C)
@@ -35,7 +35,7 @@ $ python3 main.py --type A2C --env CartPole-v1
 ```
 <br />
 <div align="center">
-<img width="40%" src ="https://github.com/germain-hug/Advanced-Deep-RL-Keras/blob/master/results/a2c.png?raw=true" /></div>  
+<img width="60%" src ="https://github.com/germain-hug/Advanced-Deep-RL-Keras/blob/master/results/a2c.png?raw=true" /></div>  
 <br />
 
 ## N-step Asynchronous Advantage Actor Critic (A3C)
@@ -55,7 +55,7 @@ $ python3 main.py --type DQN --env CartPole-v1 --batch_size 512
 
 <br />
 <div align="center">
-<img width="40%" src ="https://github.com/germain-hug/Advanced-Deep-RL-Keras/blob/master/results/dqn.png?raw=true" /></div>  
+<img width="60%" src ="https://github.com/germain-hug/Advanced-Deep-RL-Keras/blob/master/results/dqn.png?raw=true" /></div>  
 <br />
 
 ## Deep Deterministic Policy Gradient (DDPG)
@@ -77,7 +77,7 @@ Using tensorboard, you can monitor the agent's score as it is training. When tra
 $ tensorboard --logdir=A2C/tensorboard_CartPole-v1/
 ```
 ### Results plotting
-When training with the argument --gather_stats, a log file is generated: `logs.csv`. Using [plotly](https://plot.ly/), you can visualize the average reward per episode.
+When training with the argument --gather_stats, a log file is generated containing scores averaged over 10 games at every episode: `logs.csv`. Using [plotly](https://plot.ly/), you can visualize the average reward per episode.
 To do so, you will first need to install plotly and get a [free licence](https://plot.ly/python/getting-started/).
 ```bash
 pip3 install plotly
