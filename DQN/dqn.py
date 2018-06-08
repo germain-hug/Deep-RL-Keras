@@ -14,7 +14,7 @@ class DQN:
     """ Deep Q-Learning Main Algorithm
     """
 
-    def __init__(self, action_dim, state_dim, gamma = 0.99, epsilon = 0.25, epsilon_decay = 0.99, buffer_size = 100000, lr = 0.001, tau = 0.1):
+    def __init__(self, action_dim, state_dim, gamma = 0.99, epsilon = 0.25, epsilon_decay = 0.99, buffer_size = 100000, lr = 0.001, tau = 0.01):
         """ Initialization
         """
         # Environment and DQN parameters
@@ -87,7 +87,7 @@ class DQN:
                 self.train_agent(args.batch_size)
 
             # Gather stats every 50 episode for plotting
-            if(e%50==0 and args.gather_stats):
+            if(args.gather_stats):
                 mean, stdev = gather_stats(self, env)
                 results.append([e, mean, stdev])
 
