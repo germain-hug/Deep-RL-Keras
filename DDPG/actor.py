@@ -27,13 +27,13 @@ class Actor:
         """
         inp = Input((self.env_dim))
         #
-        x = Dense(512, activation='relu', kernel_initializer='he_uniform')(inp)
-        x = GaussianNoise(0.1)(x)
+        x = Dense(256, activation='relu', kernel_initializer='he_uniform')(inp)
+        x = GaussianNoise(1.0)(x)
         x = BatchNormalization()(x)
         #
         x = Flatten()(x)
-        x = Dense(256, activation='relu', kernel_initializer='he_uniform')(x)
-        x = GaussianNoise(0.1)(x)
+        x = Dense(128, activation='relu', kernel_initializer='he_uniform')(x)
+        x = GaussianNoise(1.0)(x)
         #
         out = Dense(self.act_dim, activation='tanh')(x)
         out = Lambda(lambda i: i * self.act_range)(out)

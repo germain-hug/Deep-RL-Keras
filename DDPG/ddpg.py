@@ -12,7 +12,7 @@ class DDPG:
     """ Deep Deterministic Policy Gradient (DDPG) Helper Class
     """
 
-    def __init__(self, act_dim, env_dim, act_range, k, buffer_size = 200000, gamma = 0.99, lr = 0.00001, tau = 0.001):
+    def __init__(self, act_dim, env_dim, act_range, k, buffer_size = 200000, gamma = 0.99, lr = 0.001, tau = 0.001):
         """ Initialization
         """
         # Environment and A2C parameters
@@ -89,7 +89,7 @@ class DDPG:
                 a = self.policy_action(old_state)
                 # Clip continuous values to be valid w.r.t. environment
                 ou_noise = - 0.15 * ou_noise + 0.3 * np.random.randn(self.act_dim)
-                a = a + 0.1 * ou_noise
+                #a = a + ou_noise
                 a = np.clip(a, -self.act_range, self.act_range)
                 # Retrieve new state, reward, and whether the state is terminal
                 new_state, r, done, _ = env.step(a)
