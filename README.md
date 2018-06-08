@@ -16,7 +16,7 @@ Modular Implementation of popular Deep Reinforcement Learning algorithms in Kera
 
 <br />
 <div align="center">
-<img width="30%" src ="https://github.com/germain-hug/Advanced-Deep-RL-Keras/blob/master/A2C/results/a2c.gif?raw=true" />
+<img width="30%" src ="https://github.com/germain-hug/Advanced-Deep-RL-Keras/blob/master/results/a2c.gif?raw=true" />
 <p style="text-align=center";> Results [Cartpole-V1] </p></div>  
 <br />
 
@@ -35,7 +35,7 @@ $ python3 main.py --type A2C --env CartPole-v1
 ```
 <br />
 <div align="center">
-<img width="40%" src ="https://github.com/germain-hug/Advanced-Deep-RL-Keras/blob/master/results/a2c.png?raw=true" />
+<img width="40%" src ="https://github.com/germain-hug/Advanced-Deep-RL-Keras/blob/master/results/a2c.png?raw=true" /></div>  
 <br />
 
 ## N-step Asynchronous Advantage Actor Critic (A3C)
@@ -55,7 +55,7 @@ $ python3 main.py --type DQN --env CartPole-v1 --batch_size 512
 
 <br />
 <div align="center">
-<img width="40%" src ="https://github.com/germain-hug/Advanced-Deep-RL-Keras/blob/master/results/dqn.png?raw=true" />
+<img width="40%" src ="https://github.com/germain-hug/Advanced-Deep-RL-Keras/blob/master/results/dqn.png?raw=true" /></div>  
 <br />
 
 ## Deep Deterministic Policy Gradient (DDPG)
