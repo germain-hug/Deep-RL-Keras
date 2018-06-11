@@ -14,7 +14,7 @@ class DDQN:
     """ Deep Q-Learning Main Algorithm
     """
 
-    def __init__(self, action_dim, state_dim, gamma = 0.99, epsilon = 0.25, epsilon_decay = 0.99, buffer_size = 100000, lr = 0.001, tau = 0.01):
+    def __init__(self, action_dim, state_dim, with_per, gamma = 0.99, epsilon = 0.25, epsilon_decay = 0.99, buffer_size = 100000, lr = 0.001, tau = 0.01):
         """ Initialization
         """
         # Environment and DDQN parameters
@@ -26,7 +26,7 @@ class DDQN:
         # Create actor and critic networks
         self.agent = Agent(state_dim, action_dim, lr, tau)
         # Memory Buffer for Experience Replay
-        self.buffer = MemoryBuffer(buffer_size)
+        self.buffer = MemoryBuffer(buffer_size, with_per)
 
     def policy_action(self, s):
         """ Apply an espilon-greedy policy to pick next action

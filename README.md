@@ -11,6 +11,7 @@ Modular Implementation of popular Deep Reinforcement Learning algorithms in Kera
 - [ ] Dueling DDQN (DDQN)
 - [ ] Rainbow
 - [ ] REINFORCE
+- [ ] DYNA-Q
 - [ ] Proximal Policy Optimization (PPO)
 - [ ] Impala
 - [ ] Spiral
@@ -51,7 +52,6 @@ $ python3 main.py --type A3C --env CartPole-v1 --nb_episodes 10000 --n_threads 1
 The original DQN algorithm is used to estimate Q-values, ie. predict actions values for every state. Using an epsilon-greedy policy, we can update our Q-values, leveraging the Bellman equation, and by sampling from experience using Experience Replay. Furthermore, for a more stable and accurate estimation of our Q-values, we use a second network (the _target_ network) for prediction. This second network is updated at a slower rate Tau, at every training step.
 
 ```bash
-$ python3 main.py --type DDQN --env BreakoutNoFrameskip-v4 --is_atari
 $ python3 main.py --type DDQN --env CartPole-v1 --batch_size 512
 ```
 
@@ -64,8 +64,7 @@ $ python3 main.py --type DDQN --env CartPole-v1 --batch_size 512
 
 
 ```bash
-$ python3 main.py --type DDQN --env BreakoutNoFrameskip-v4 --is_atari
-$ python3 main.py --type DDQN --env CartPole-v1 --batch_size 512
+$ python3 main.py --type DDQN --env CartPole-v1 --batch_size 512 --with_PER
 ```
 
 
@@ -105,7 +104,6 @@ python3 utils/plot_results.py <path_to_your_log_file>
 
 # Acknowledgments
 
-- Memory Buffer template by [Patrick Emami](http://pemami4911.github.io/)
 - Atari Environment Helper Class template by [ShanHaoYu](https://github.com/ShanHaoYu/Deep-Q-Network-Breakout/blob/master/environment.py)
 - Atari Environment Wrappers by [OpenAI](github.com/openai/baselines/blob/master/baselines/common/atari_wrappers.py)
 

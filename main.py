@@ -31,6 +31,7 @@ def parse_args(args):
     #
     parser.add_argument('--type', type=str, default='DDQN',help="Algorithm to train from {A2C, A3C, DDQN, DDPG}")
     parser.add_argument('--is_atari', dest='is_atari', action='store_true', help="Atari Environment")
+    parser.add_argument('--with_PER', dest='with_per', action='store_true', help="Use Prioritized Experience Replay (DDQN + PER)")
     #
     parser.add_argument('--nb_episodes', type=int, default=5000, help="Number of training episodes")
     parser.add_argument('--batch_size', type=int, default=64, help="Batch size (experience replay)")
@@ -81,7 +82,7 @@ def main(args=None):
 
     # Pick algorithm to train
     if(args.type=="DDQN"):
-        algo = DDQN(action_dim, state_dim)
+        algo = DDQN(action_dim, state_dim, args.with_per)
     elif(args.type=="A2C"):
         algo = A2C(action_dim, state_dim)
     elif(args.type=="A3C"):

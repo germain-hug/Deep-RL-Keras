@@ -2,45 +2,90 @@ import random
 import numpy as np
 
 from collections import deque
+from SumTree import SumTree
 
 class MemoryBuffer(object):
     """ Memory Buffer Helper class for Experience Replay
-    using a double-ended queue
+    using a double-ended queue or a Sum Tree (for PER)
     """
-    def __init__(self, buffer_size):
+    def __init__(self, buffer_size, with_per = False):
+        """ Initialization
+        """
+        # Prioritized Experience Replay
+        if(with_per):
+            self.alpha = 0.5
+            self.epsilon = 0.01
+            self.buffer = SumTree(buffer_size)
+        # Standard Buffer
+        else:
+            self.buffer = deque()
+
         self.count = 0
-        self.buffer = deque()
         self.buffer_size = buffer_size
 
-    def memorize(self, state, action, reward, done, new_state):
+    def memorize(self, state, action, reward, done, new_state, error = 0):
+        """ Save an experience to memory, optionally with its TD-Error
+        """
+
         experience = (state, action, reward, done, new_state)
-        # Check if buffer is already full
-        if self.count < self.buffer_size:
-            self.buffer.append(experience)
-            self.count += 1
+        if(self.with_per):
+            priority = self.priority(error)
+            self.buffer.add(priority, experience)
         else:
-            self.buffer.popleft()
-            self.buffer.append(experience)
+            # Check if buffer is already full
+            if self.count < self.buffer_size:
+                self.buffer.append(experience)
+                self.count += 1
+            else:
+                self.buffer.popleft()
+                self.buffer.append(experience)
+
+    def priority(self, error):
+        """ Compute an experience priority, as per Schaul et al.
+        """
+        return (error + self.epsilon) ** self.alpha
 
     def size(self):
+        """ Current Buffer Occupation
+        """
         return self.count
 
     def sample_batch(self, batch_size):
+        """ Sample a batch, optionally with (PER)
+        """
         batch = []
 
-        if self.count < batch_size:
+        # Sample using prorities
+        if(self.with_per):
+            T = self.buffer.total() // batch_size
+            for i in range(batch_size):
+                a, b = T * i, T * (i + 1)
+                s = random.uniform(a, b)
+                (idx, p, data) = self.buffer.get(s)
+                batch.append( (idx, data) )
+        # Sample randomly from Buffer
+        elif self.count < batch_size:
             batch = random.sample(self.buffer, self.count)
         else:
             batch = random.sample(self.buffer, batch_size)
 
+        # Return a batch of experience
         s_batch = np.array([i[0] for i in batch])
         a_batch = np.array([i[1] for i in batch])
         r_batch = np.array([i[2] for i in batch])
         d_batch = np.array([i[3] for i in batch])
         new_s_batch = np.array([i[4] for i in batch])
-
+        
         return s_batch, a_batch, r_batch, d_batch, new_s_batch
 
+    def update(self, idx, new_error):
+        """ Update priority for idx (PER)
+        """
+        self.buffer.update(idx, self.priority(new_error))
+
     def clear(self):
-        self.buffer = deque()
+        """ Clear buffer / Sum Tree
+        """
+        if(self.with_per): self.buffer = SumTree(buffer_size)
+        else: self.buffer = deque()
         self.count = 0
