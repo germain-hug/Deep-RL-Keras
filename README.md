@@ -4,10 +4,11 @@ Modular Implementation of popular Deep Reinforcement Learning algorithms in Kera
 
 - [x] Synchronous N-step Advantage Actor Critic ([A2C](https://github.com/germain-hug/Advanced-Deep-RL-Keras#n-step-advantage-actor-critic-a2c))
 - [x] Asynchronous N-step Advantage Actor-Critic ([A3C](https://github.com/germain-hug/Advanced-Deep-RL-Keras#n-step-asynchronous-advantage-actor-critic-a3c))
-- [x] Deep Q-Learning ([DQN](https://github.com/germain-hug/Advanced-Deep-RL-Keras#deep-q-learning-dqn))
+- [x] Double Deep Q-Network ([DDQN](https://github.com/germain-hug/Advanced-Deep-RL-Keras#double-deep-q-network-ddqn))
+- [x] Double Deep Q-Network with Prioritized Experience Replay  ([DDQN + PER](https://github.com/germain-hug/Advanced-Deep-RL-Keras#))
 - [ ] Deep Deterministic Policy Gradient with Parameter Noise ([DDPG](https://github.com/germain-hug/Advanced-Deep-RL-Keras#deep-deterministic-policy-gradient-ddpg))
 - [ ] Deep Deterministic Policy Gradient with Hindsight Experience Replay ([DDPG + HER](https://github.com/germain-hug/Advanced-Deep-RL-Keras#deep-deterministic-policy-gradient-with-hindsight-experience-replay-ddpg--her))
-- [ ] Dueling DQN (DDQN)
+- [ ] Dueling DDQN (DDQN)
 - [ ] Rainbow
 - [ ] REINFORCE
 - [ ] Proximal Policy Optimization (PPO)
@@ -46,17 +47,27 @@ $ python3 main.py --type A3C --env BreakoutNoFrameskip-v4 --is_atari --nb_episod
 $ python3 main.py --type A3C --env CartPole-v1 --nb_episodes 10000 --n_threads 16
 ```
 
-## Deep Q-Learning (DQN)
+## Double Deep Q-Network (DDQN)
+The original DQN algorithm is used to estimate Q-values, ie. predict actions values for every state. Using an epsilon-greedy policy, we can update our Q-values, leveraging the Bellman equation, and by sampling from experience using Experience Replay. Furthermore, for a more stable and accurate estimation of our Q-values, we use a second network (the _target_ network) for prediction. This second network is updated at a slower rate Tau, at every training step.
 
 ```bash
-$ python3 main.py --type DQN --env BreakoutNoFrameskip-v4 --is_atari
-$ python3 main.py --type DQN --env CartPole-v1 --batch_size 512
+$ python3 main.py --type DDQN --env BreakoutNoFrameskip-v4 --is_atari
+$ python3 main.py --type DDQN --env CartPole-v1 --batch_size 512
 ```
 
 <br />
 <div align="center">
-<img width="60%" src ="https://github.com/germain-hug/Advanced-Deep-RL-Keras/blob/master/results/dqn.png?raw=true" /></div>  
+<img width="60%" src ="https://github.com/germain-hug/Advanced-Deep-RL-Keras/blob/master/results/ddqn.png?raw=true" /></div>  
 <br />
+
+## Double Deep Q-Network with Prioritized Experience Replay (DDQN + PER)
+
+
+```bash
+$ python3 main.py --type DDQN --env BreakoutNoFrameskip-v4 --is_atari
+$ python3 main.py --type DDQN --env CartPole-v1 --batch_size 512
+```
+
 
 ## Deep Deterministic Policy Gradient (DDPG)
 The DDPG algorithm is a model-free, off-policy algorithm for continuous action spaces. Similarly to A2C, it is an actor-critic algorithm in which the actor is trained on a deterministic target policy, and the critic predicts Q-Values. In order to reduce variance and increase stability, we use experience replay and separate target networks. Moreover, as hinted by [OpenAI](https://blog.openai.com/better-exploration-with-parameter-noise/), we encourage exploration through parameter space noise (as opposed to traditional action space noise). We test DDPG on the Lunar Lander environment.

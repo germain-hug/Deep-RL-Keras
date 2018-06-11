@@ -11,7 +11,7 @@ import tensorflow as tf
 
 from A2C.a2c import A2C
 from A3C.a3c import A3C
-from DQN.dqn import DQN
+from DDQN.ddqn import DDQN
 from DDPG.ddpg import DDPG
 
 from keras.backend.tensorflow_backend import set_session
@@ -29,7 +29,7 @@ def parse_args(args):
     """
     parser = argparse.ArgumentParser(description='Training parameters')
     #
-    parser.add_argument('--type', type=str, default='DQN',help="Algorithm to train from {A2C, A3C, DQN, DDPG}")
+    parser.add_argument('--type', type=str, default='DDQN',help="Algorithm to train from {A2C, A3C, DDQN, DDPG}")
     parser.add_argument('--is_atari', dest='is_atari', action='store_true', help="Atari Environment")
     #
     parser.add_argument('--nb_episodes', type=int, default=5000, help="Number of training episodes")
@@ -80,8 +80,8 @@ def main(args=None):
         action_dim = env.action_space.n
 
     # Pick algorithm to train
-    if(args.type=="DQN"):
-        algo = DQN(action_dim, state_dim)
+    if(args.type=="DDQN"):
+        algo = DDQN(action_dim, state_dim)
     elif(args.type=="A2C"):
         algo = A2C(action_dim, state_dim)
     elif(args.type=="A3C"):
