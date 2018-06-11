@@ -34,7 +34,7 @@ class Agent:
             x = Dense(256, activation='relu')(x)
         else:
             x = Dense(64, activation='relu', kernel_initializer='he_uniform')(inp)
-            x = Dense(128, activation='relu', kernel_initializer='he_uniform')(x)
+            x = Dense(64, activation='relu', kernel_initializer='he_uniform')(x)
         x = Dense(self.action_dim, activation='linear', kernel_initializer='he_uniform')(x)
         return Model(inp, x)
 

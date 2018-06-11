@@ -61,7 +61,7 @@ $ python3 main.py --type DDQN --env CartPole-v1 --batch_size 512
 <br />
 
 ## Double Deep Q-Network with Prioritized Experience Replay (DDQN + PER)
-
+We can improve our system by adding in Prioritized Experience Replay (PER), which aims at performing importance sampling on the gathered experience. Here, the experience is ranking by its TD-Error, whose value is obtained when computing targets.
 
 ```bash
 $ python3 main.py --type DDQN --env CartPole-v1 --batch_size 512 --with_PER
@@ -104,8 +104,9 @@ python3 utils/plot_results.py <path_to_your_log_file>
 
 # Acknowledgments
 
-- Atari Environment Helper Class template by [ShanHaoYu](https://github.com/ShanHaoYu/Deep-Q-Network-Breakout/blob/master/environment.py)
+- Atari Environment Helper Class template by [@ShanHaoYu](https://github.com/ShanHaoYu/Deep-Q-Network-Breakout/blob/master/environment.py)
 - Atari Environment Wrappers by [OpenAI](github.com/openai/baselines/blob/master/baselines/common/atari_wrappers.py)
+- SumTree Helper Class by [@jaara](https://github.com/jaara/AI-blog/blob/master/SumTree.py)
 
 # References (Papers)
 

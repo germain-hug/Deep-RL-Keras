@@ -14,19 +14,24 @@ class DDQN:
     """ Deep Q-Learning Main Algorithm
     """
 
-    def __init__(self, action_dim, state_dim, with_per, gamma = 0.99, epsilon = 0.25, epsilon_decay = 0.99, buffer_size = 100000, lr = 0.001, tau = 0.01):
+    def __init__(self, action_dim, state_dim, with_per):
         """ Initialization
         """
         # Environment and DDQN parameters
+        self.with_per = with_per
         self.action_dim = action_dim
         self.state_dim = state_dim
-        self.gamma = gamma
-        self.epsilon = epsilon
-        self.epsilon_decay = epsilon_decay
+        #
+        self.lr = 1e-5
+        self.tau = 1e-2
+        self.gamma = 0.99
+        self.epsilon = 0.8
+        self.epsilon_decay = 0.99
+        self.buffer_size = 100000
         # Create actor and critic networks
-        self.agent = Agent(state_dim, action_dim, lr, tau)
+        self.agent = Agent(state_dim, action_dim, self.lr, self.tau)
         # Memory Buffer for Experience Replay
-        self.buffer = MemoryBuffer(buffer_size, with_per)
+        self.buffer = MemoryBuffer(self.buffer_size, with_per)
 
     def policy_action(self, s):
         """ Apply an espilon-greedy policy to pick next action
@@ -39,16 +44,23 @@ class DDQN:
     def train_agent(self, batch_size):
         """ Train Q-network on batch sampled from the buffer
         """
-        # Sample experience from memory buffer
-        s, a, r, d, new_s = self.buffer.sample_batch(batch_size)
+        # Sample experience from memory buffer (optionally with PER)
+        s, a, r, d, new_s, idx = self.buffer.sample_batch(batch_size)
+
         # Apply Bellman Equation on batch samples to train our DDQN
-        target = np.zeros((batch_size, self.action_dim))
+        target = self.agent.predict(new_s)
+        q_targ = self.agent.target_predict(new_s)
         for i in range(s.shape[0]):
-            new_r = r[i]
-            if not d[i]: new_r = (r[i] + self.gamma * np.amax(self.agent.target_predict(new_s[i])[0]))
-            q_value = self.agent.predict(s[i])[0]
-            q_value[a[i]] = new_r
-            target[i, :] = q_value
+            old_q = target[i, a[i]]
+            if d[i]:
+                target[i, a[i]] = r[i]
+            else:
+                next_best_action = np.argmax(target[i,:])
+                target[i, a[i]] = r[i] + self.gamma * q_targ[i, next_best_action]
+            if(self.with_per):
+                # Update PER Sum Tree
+                self.buffer.update(idx[i], abs(old_q - target[i, a[i]]))
+
         # Train on batch
         self.agent.fit(s, target)
         # Decay epsilon
@@ -105,4 +117,13 @@ class DDQN:
     def memorize(self, state, action, reward, done, new_state):
         """ Store experience in memory buffer
         """
-        self.buffer.memorize(state, action, reward, done, new_state)
+
+        if(self.with_per):
+            q_val = self.agent.predict(new_state)
+            q_val_t = self.agent.target_predict(new_state)
+            next_best_action = np.argmax(q_val)
+            new_val = reward + self.gamma * q_val_t[0, next_best_action]
+            td_error = abs(new_val - q_val)[0]
+        else:
+            td_error = 0
+        self.buffer.memorize(state, action, reward, done, new_state, td_error)

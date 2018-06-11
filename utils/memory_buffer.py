@@ -2,7 +2,7 @@ import random
 import numpy as np
 
 from collections import deque
-from SumTree import SumTree
+from .sumtree import SumTree
 
 class MemoryBuffer(object):
     """ Memory Buffer Helper class for Experience Replay
@@ -11,26 +11,27 @@ class MemoryBuffer(object):
     def __init__(self, buffer_size, with_per = False):
         """ Initialization
         """
-        # Prioritized Experience Replay
         if(with_per):
+            # Prioritized Experience Replay
             self.alpha = 0.5
             self.epsilon = 0.01
             self.buffer = SumTree(buffer_size)
-        # Standard Buffer
         else:
+            # Standard Buffer
             self.buffer = deque()
-
         self.count = 0
+        self.with_per = with_per
         self.buffer_size = buffer_size
 
-    def memorize(self, state, action, reward, done, new_state, error = 0):
+    def memorize(self, state, action, reward, done, new_state, error):
         """ Save an experience to memory, optionally with its TD-Error
         """
 
         experience = (state, action, reward, done, new_state)
         if(self.with_per):
-            priority = self.priority(error)
+            priority = self.priority(error[0])
             self.buffer.add(priority, experience)
+            self.count += 1
         else:
             # Check if buffer is already full
             if self.count < self.buffer_size:
@@ -61,12 +62,15 @@ class MemoryBuffer(object):
             for i in range(batch_size):
                 a, b = T * i, T * (i + 1)
                 s = random.uniform(a, b)
-                (idx, p, data) = self.buffer.get(s)
-                batch.append( (idx, data) )
+                idx, error, data = self.buffer.get(s)
+                batch.append((*data, idx))
+            idx = np.array([i[5] for i in batch])
         # Sample randomly from Buffer
         elif self.count < batch_size:
+            idx = None
             batch = random.sample(self.buffer, self.count)
         else:
+            idx = None
             batch = random.sample(self.buffer, batch_size)
 
         # Return a batch of experience
@@ -75,8 +79,7 @@ class MemoryBuffer(object):
         r_batch = np.array([i[2] for i in batch])
         d_batch = np.array([i[3] for i in batch])
         new_s_batch = np.array([i[4] for i in batch])
-        
-        return s_batch, a_batch, r_batch, d_batch, new_s_batch
+        return s_batch, a_batch, r_batch, d_batch, new_s_batch, idx
 
     def update(self, idx, new_error):
         """ Update priority for idx (PER)
