@@ -76,13 +76,14 @@ def main(args=None):
         act_range = action_space.high
     else:
         # Standard Environments
-        env = gym.make(args.env)
-        state_dim = env.observation_space.shape
-        action_dim = env.action_space.n
+        env = Environment(gym.make(args.env), args.consecutive_frames)
+        env.reset()
+        state_dim = env.get_state_size()
+        action_dim = gym.make(args.env).action_space.n
 
     # Pick algorithm to train
     if(args.type=="DDQN"):
-        algo = DDQN(action_dim, state_dim, args.with_per)
+        algo = DDQN(action_dim, state_dim, args.consecutive_frames, args.with_per)
     elif(args.type=="A2C"):
         algo = A2C(action_dim, state_dim)
     elif(args.type=="A3C"):

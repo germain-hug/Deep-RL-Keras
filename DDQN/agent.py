@@ -1,10 +1,11 @@
 import sys
 import numpy as np
+import keras.backend as K
 
 from keras.models import Model
 from keras.optimizers import Adam
-from keras.layers import Input, Dense, Flatten
-
+from keras.layers import Input, Dense, Flatten, Reshape, LSTM
+from keras.regularizers import l2
 from utils.networks import conv_block
 
 class Agent:
@@ -23,6 +24,9 @@ class Agent:
         self.target_model.compile(Adam(lr), 'mse')
         self.target_model.set_weights(self.model.get_weights())
 
+    def huber_loss(self, y_true, y_pred):
+        return K.mean(K.sqrt(1 + K.square(y_pred - y_true)) - 1, axis=-1)
+
     def network(self):
         """ Build Deep Q-Network
         """
@@ -33,19 +37,21 @@ class Agent:
             x = Flatten()(x)
             x = Dense(256, activation='relu')(x)
         else:
-            x = Dense(64, activation='relu', kernel_initializer='he_uniform')(inp)
-            x = Dense(64, activation='relu', kernel_initializer='he_uniform')(x)
-        x = Dense(self.action_dim, activation='linear', kernel_initializer='he_uniform')(x)
+            x = Flatten()(inp)
+            x = Dense(24, activation='relu')(x)
+            x = Dense(24, activation='relu')(x)
+        x = Dense(self.action_dim, activation='linear')(x)
         return Model(inp, x)
 
     def transfer_weights(self):
         """ Transfer Weights from Model to Target at rate Tau
         """
-        W = self.model.get_weights()
-        tgt_W = self.target_model.get_weights()
-        for i in range(len(W)):
-            tgt_W[i] = self.tau * W[i] + (1 - self.tau) * tgt_W[i]
-        self.target_model.set_weights(tgt_W)
+        # W = self.model.get_weights()
+        # tgt_W = self.target_model.get_weights()
+        # for i in range(len(W)):
+        #     tgt_W[i] = self.tau * W[i] + (1 - self.tau) * tgt_W[i]
+        # self.target_model.set_weights(tgt_W)
+        self.target_model.set_weights(self.model.get_weights())
 
     def fit(self, inp, targ):
         """ Perform one epoch of training
@@ -64,5 +70,5 @@ class Agent:
 
     def reshape(self, x):
         if len(x.shape) < 4 and len(self.state_dim) > 2: return np.expand_dims(x, axis=0)
-        elif len(x.shape) < 2: return np.expand_dims(x, axis=0)
+        elif len(x.shape) < 3: return np.expand_dims(x, axis=0)
         else: return x

@@ -14,22 +14,22 @@ class DDQN:
     """ Deep Q-Learning Main Algorithm
     """
 
-    def __init__(self, action_dim, state_dim, with_per):
+    def __init__(self, action_dim, state_dim, k, with_per):
         """ Initialization
         """
         # Environment and DDQN parameters
         self.with_per = with_per
         self.action_dim = action_dim
-        self.state_dim = state_dim
+        self.state_dim = (k,) + state_dim
         #
-        self.lr = 1e-5
-        self.tau = 1e-2
-        self.gamma = 0.99
-        self.epsilon = 0.8
+        self.lr = 1e-3
+        self.tau = 1.0#e-1
+        self.gamma = 0.95
+        self.epsilon = 1.0
         self.epsilon_decay = 0.99
-        self.buffer_size = 100000
+        self.buffer_size = 2000
         # Create actor and critic networks
-        self.agent = Agent(state_dim, action_dim, self.lr, self.tau)
+        self.agent = Agent(self.state_dim, action_dim, self.lr, self.tau)
         # Memory Buffer for Experience Replay
         self.buffer = MemoryBuffer(self.buffer_size, with_per)
 
@@ -48,25 +48,23 @@ class DDQN:
         s, a, r, d, new_s, idx = self.buffer.sample_batch(batch_size)
 
         # Apply Bellman Equation on batch samples to train our DDQN
-        target = self.agent.predict(new_s)
-        q_targ = self.agent.target_predict(new_s)
         for i in range(s.shape[0]):
-            old_q = target[i, a[i]]
+            target = self.agent.predict(new_s[i])
+            q_targ = self.agent.target_predict(new_s[i])
+            old_q = target[0, a[i]]
             if d[i]:
-                target[i, a[i]] = r[i]
+                target[0, a[i]] = r[i]
             else:
-                next_best_action = np.argmax(target[i,:])
-                target[i, a[i]] = r[i] + self.gamma * q_targ[i, next_best_action]
+                next_best_action = np.argmax(target[0,:])
+                target[0, a[i]] = r[i] + self.gamma * q_targ[0, next_best_action]
             if(self.with_per):
                 # Update PER Sum Tree
-                self.buffer.update(idx[i], abs(old_q - target[i, a[i]]))
-
-        # Train on batch
-        self.agent.fit(s, target)
+                self.buffer.update(idx[i], abs(old_q - target[0, a[i]]))
+            # Train on batch
+            self.agent.fit(s[i], target)
         # Decay epsilon
         self.epsilon *= self.epsilon_decay
-        # Transfer weights to target network
-        self.agent.transfer_weights()
+
 
     def train(self, env, args, summary_writer):
         """ Main DDQN Training Algorithm
@@ -77,9 +75,8 @@ class DDQN:
 
         for e in tqdm_e:
             # Reset episode
-            time, cumul_reward, done = 0, 0, False
+            time, cumul_reward, done  = 0, 0, False
             old_state = env.reset()
-            actions, states, rewards = [], [], []
 
             while not done:
                 if args.render: env.render()
@@ -87,16 +84,19 @@ class DDQN:
                 a = self.policy_action(old_state)
                 # Retrieve new state, reward, and whether the state is terminal
                 new_state, r, done, _ = env.step(a)
+                r = r if not done else -10
                 # Memorize for experience replay
                 self.memorize(old_state, a, r, done, new_state)
                 # Update current state
                 old_state = new_state
                 cumul_reward += r
                 time += 1
-
-            # Train DDQN
-            if(self.buffer.size() > args.batch_size):
-                self.train_agent(args.batch_size)
+                # Transfer weights to target network
+                if(done):
+                    self.agent.transfer_weights()
+                # Train DDQN
+                if(self.buffer.size() > args.batch_size):
+                    self.train_agent(args.batch_size)
 
             # Gather stats every 50 episode for plotting
             if(args.gather_stats):

@@ -4,7 +4,7 @@ from collections import deque
 
 class Environment(object):
     """ Environment Helper Class (Multiple State Buffer) for Continuous Action Environments
-    (MountainCarContinuous-v0, LunarLanderContinuous-v2, etc..)
+    (MountainCarContinuous-v0, LunarLanderContinuous-v2, etc..), and MujuCo Environments
     """
     def __init__(self, gym_env, action_repeat):
         self.env = gym_env
