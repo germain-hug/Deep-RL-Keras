@@ -22,14 +22,14 @@ Modular Implementation of popular Deep Reinforcement Learning algorithms in Kera
 <p style="text-align=center";> Results </p></div>  
 <br />
 
-## Getting Started
+# Getting Started
 
 This implementation requires keras 2.1.6, as well as OpenAI gym.
 ``` bash
 $ pip install gym keras==2.1.6
 ```
 
-# Arguments
+### Arguments
 
 | Argument | Description | Values |
 | :---         |     :---      |          :--- |
