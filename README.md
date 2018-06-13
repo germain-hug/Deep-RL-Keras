@@ -4,10 +4,10 @@ Modular Implementation of popular Deep Reinforcement Learning algorithms in Kera
 
 - [x] Synchronous N-step Advantage Actor Critic ([A2C](https://github.com/germain-hug/Advanced-Deep-RL-Keras#n-step-advantage-actor-critic-a2c))
 - [x] Asynchronous N-step Advantage Actor-Critic ([A3C](https://github.com/germain-hug/Advanced-Deep-RL-Keras#n-step-asynchronous-advantage-actor-critic-a3c))
-- [x] Double Deep Q-Network ([DDQN](https://github.com/germain-hug/Advanced-Deep-RL-Keras#double-deep-q-network-ddqn))
-- [x] Double Deep Q-Network with Prioritized Experience Replay  ([DDQN + PER](https://github.com/germain-hug/Advanced-Deep-RL-Keras#))
 - [ ] Deep Deterministic Policy Gradient with Parameter Noise ([DDPG](https://github.com/germain-hug/Advanced-Deep-RL-Keras#deep-deterministic-policy-gradient-ddpg))
 - [ ] Deep Deterministic Policy Gradient with Hindsight Experience Replay ([DDPG + HER](https://github.com/germain-hug/Advanced-Deep-RL-Keras#deep-deterministic-policy-gradient-with-hindsight-experience-replay-ddpg--her))
+- [x] Double Deep Q-Network ([DDQN](https://github.com/germain-hug/Advanced-Deep-RL-Keras#double-deep-q-network-ddqn))
+- [x] Double Deep Q-Network with Prioritized Experience Replay  ([DDQN + PER](https://github.com/germain-hug/Advanced-Deep-RL-Keras#deep-deterministic-policy-gradient-with-hindsight-experience-replay-ddpg--her))
 - [ ] Dueling DDQN (DDQN)
 - [ ] Rainbow
 - [ ] REINFORCE
@@ -15,12 +15,6 @@ Modular Implementation of popular Deep Reinforcement Learning algorithms in Kera
 - [ ] Proximal Policy Optimization (PPO)
 - [ ] Impala
 - [ ] Spiral
-
-<br />
-<div align="center">
-<img width="30%" src ="https://github.com/germain-hug/Advanced-Deep-RL-Keras/blob/master/results/a2c.gif?raw=true" />
-<p style="text-align=center";> Results </p></div>  
-<br />
 
 ## Getting Started
 
@@ -44,6 +38,12 @@ $ pip install gym keras==2.1.6
 | --gather_stats     | Whether to compute stats of scores averaged over 10 games (slow, see below)       | -      |
 | --render     | Whether to render the environment as it is training       | -      |
 | --gpu     | GPU index       | 0      |
+
+<br />
+<div align="center">
+<img width="30%" src ="https://github.com/germain-hug/Advanced-Deep-RL-Keras/blob/master/results/a2c.gif?raw=true" />
+<p style="text-align=center";> Results </p></div>  
+<br />
 
 
 # Actor-Critic Algorithms
@@ -77,7 +77,7 @@ $ python3 main.py --type DDPG --env LunarLanderContinuous-v2
 ### Deep Deterministic Policy Gradient with Hindsight Experience Replay (DDPG + HER)
 Hindsight Experience Replay (HER) brings an improvement to both discrete and continuous action space off-policy methods. It is particularly suited for robotics application as it enables efficient learning from _sparse_ and _binary_ rewards. HER formulates the problem as a multi-goal task, where new goals are being sampled at the start of each episode through a specific strategy.
 
-## Double Deep Q-Network (DDQN)
+### Double Deep Q-Network (DDQN)
 The DQN algorithm is a Q-learning algorithm, which uses a Deep Neural Network as a Q-value function approximator. We estimate target Q-values by leveraging the Bellman equation, and gather experience through an epsilon-greedy policy. For more stability, we sample past experiences randomly (Experience Replay). A variant of the DQN algorithm is the Double-DQN (or DDQN). For a more accurate estimation of our Q-values, we use a second network to temper the overestimations of the Q-values by the original network. This _target_ network is updated at a slower rate Tau, at every training step.
 
 ```bash
