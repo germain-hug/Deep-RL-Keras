@@ -15,7 +15,6 @@ class Actor(Agent):
         self.model = self.addHead(network)
         self.action_pl = K.placeholder(shape=(None, self.out_dim))
         self.advantages_pl = K.placeholder(shape=(None,))
-
     def addHead(self, network):
         """ Assemble Actor network to predict probability of each action
         """

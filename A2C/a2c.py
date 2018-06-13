@@ -5,7 +5,7 @@ from tqdm import tqdm
 from keras.models import Model
 from keras import regularizers
 from keras.utils import to_categorical
-from keras.layers import Input, Dense
+from keras.layers import Input, Dense, Flatten
 
 from .critic import Critic
 from .actor import Actor
@@ -16,17 +16,17 @@ class A2C:
     """ Actor-Critic Main Algorithm
     """
 
-    def __init__(self, act_dim, env_dim, gamma = 0.99, lr = 0.0001):
+    def __init__(self, act_dim, env_dim, k, gamma = 0.99, lr = 0.0001):
         """ Initialization
         """
         # Environment and A2C parameters
         self.act_dim = act_dim
-        self.env_dim = env_dim
+        self.env_dim = (k,) + env_dim
         self.gamma = gamma
         # Create actor and critic networks
         self.shared = self.buildNetwork()
-        self.actor = Actor(env_dim, act_dim, self.shared, lr)
-        self.critic = Critic(env_dim, act_dim, self.shared, lr)
+        self.actor = Actor(self.env_dim, act_dim, self.shared, lr)
+        self.critic = Critic(self.env_dim, act_dim, self.shared, lr)
         # Build optimizers
         self.a_opt = self.actor.optimizer()
         self.c_opt = self.critic.optimizer()
@@ -35,7 +35,8 @@ class A2C:
         """ Assemble shared layers
         """
         inp = Input((self.env_dim))
-        x = Dense(64, activation='relu')(inp)
+        x = Flatten()(inp)
+        x = Dense(64, activation='relu')(x)
         x = Dense(128, activation='relu')(x)
         return Model(inp, x)
 

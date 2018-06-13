@@ -85,7 +85,7 @@ def main(args=None):
     if(args.type=="DDQN"):
         algo = DDQN(action_dim, state_dim, args.consecutive_frames, args.with_per)
     elif(args.type=="A2C"):
-        algo = A2C(action_dim, state_dim)
+        algo = A2C(action_dim, state_dim, args.consecutive_frames)
     elif(args.type=="A3C"):
         algo = A3C(action_dim, state_dim)
     elif(args.type=="DDPG"):
