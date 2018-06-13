@@ -38,20 +38,20 @@ class Agent:
             x = Dense(256, activation='relu')(x)
         else:
             x = Flatten()(inp)
-            x = Dense(24, activation='relu')(x)
-            x = Dense(24, activation='relu')(x)
+            x = Dense(64, activation='relu')(x)
+            x = Dense(64, activation='relu')(x)
         x = Dense(self.action_dim, activation='linear')(x)
         return Model(inp, x)
 
     def transfer_weights(self):
         """ Transfer Weights from Model to Target at rate Tau
         """
-        # W = self.model.get_weights()
-        # tgt_W = self.target_model.get_weights()
-        # for i in range(len(W)):
-        #     tgt_W[i] = self.tau * W[i] + (1 - self.tau) * tgt_W[i]
-        # self.target_model.set_weights(tgt_W)
-        self.target_model.set_weights(self.model.get_weights())
+        W = self.model.get_weights()
+        tgt_W = self.target_model.get_weights()
+        for i in range(len(W)):
+            tgt_W[i] = self.tau * W[i] + (1 - self.tau) * tgt_W[i]
+        self.target_model.set_weights(tgt_W)
+        # self.target_model.set_weights(self.model.get_weights())
 
     def fit(self, inp, targ):
         """ Perform one epoch of training

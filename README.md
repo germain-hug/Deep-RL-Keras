@@ -49,10 +49,10 @@ $ python3 main.py --type A3C --env CartPole-v1 --nb_episodes 10000 --n_threads 1
 ```
 
 ## Double Deep Q-Network (DDQN)
-The original DQN algorithm is used to estimate Q-values, ie. predict actions values for every state. Using an epsilon-greedy policy, we can update our Q-values, leveraging the Bellman equation, and by sampling from experience using Experience Replay. Furthermore, for a more stable and accurate estimation of our Q-values, we use a second network (the _target_ network) for prediction. This second network is updated at a slower rate Tau, at every training step.
+The DQN algorithm is a Q-learning algorithm, which uses a Deep Neural Network as a Q-value function approximator. We estimate target Q-values by leveraging the Bellman equation, and gather experience through an epsilon-greedy policy. For more stability, we sample past experiences randomly (Experience Replay). A variant of the DQN algorithm is the Double-DQN (or DDQN). For a more accurate estimation of our Q-values, we use a second network to temper the overestimations of the Q-values by the original network. This _target_ network is updated at a slower rate Tau, at every training step.
 
 ```bash
-$ python3 main.py --type DDQN --env CartPole-v1 --batch_size 512
+$ python3 main.py --type DDQN --env CartPole-v1 --batch_size 64
 ```
 
 <br />
@@ -61,12 +61,16 @@ $ python3 main.py --type DDQN --env CartPole-v1 --batch_size 512
 <br />
 
 ## Double Deep Q-Network with Prioritized Experience Replay (DDQN + PER)
-We can improve our system by adding in Prioritized Experience Replay (PER), which aims at performing importance sampling on the gathered experience. Here, the experience is ranking by its TD-Error, whose value is obtained when computing targets.
+We can further improve our DDQN algorithm by adding in Prioritized Experience Replay (PER), which aims at performing importance sampling on the gathered experience. The experience is ranked by its TD-Error, and stored in a SumTree structure, which allows efficient retrieval of the _(s, a, r, s')_ transitions with the highest error.
 
 ```bash
-$ python3 main.py --type DDQN --env CartPole-v1 --batch_size 512 --with_PER
+$ python3 main.py --type DDQN --env CartPole-v1 --batch_size 64 --with_PER
 ```
 
+<br />
+<div align="center">
+<img width="60%" src ="https://github.com/germain-hug/Advanced-Deep-RL-Keras/blob/master/results/ddqn_per.png?raw=true" /></div>  
+<br />
 
 ## Deep Deterministic Policy Gradient (DDPG)
 The DDPG algorithm is a model-free, off-policy algorithm for continuous action spaces. Similarly to A2C, it is an actor-critic algorithm in which the actor is trained on a deterministic target policy, and the critic predicts Q-Values. In order to reduce variance and increase stability, we use experience replay and separate target networks. Moreover, as hinted by [OpenAI](https://blog.openai.com/better-exploration-with-parameter-noise/), we encourage exploration through parameter space noise (as opposed to traditional action space noise). We test DDPG on the Lunar Lander environment.
@@ -114,3 +118,6 @@ python3 utils/plot_results.py <path_to_your_log_file>
 - [Asynchronous Advantage Actor Critic (A3C)](https://arxiv.org/pdf/1602.01783.pdf)
 - [Deep Deterministic Policy Gradient (DDPG)](http://proceedings.mlr.press/v32/silver14.pdf)
 - [Hindsight Experience Replay (HER)](https://arxiv.org/pdf/1707.01495.pdf)
+- [Deep Q-Learning](https://www.cs.toronto.edu/~vmnih/docs/dqn.pdf)
+- [Double Q-Learning](https://arxiv.org/pdf/1509.06461.pdf)
+- [Prioritized Experience Replay](https://arxiv.org/pdf/1511.05952.pdf)

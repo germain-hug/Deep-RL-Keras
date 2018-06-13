@@ -23,9 +23,9 @@ class DDQN:
         self.state_dim = (k,) + state_dim
         #
         self.lr = 1e-3
-        self.tau = 1.0#e-1
-        self.gamma = 0.95
-        self.epsilon = 1.0
+        self.tau = 1e-2
+        self.gamma = 0.99
+        self.epsilon = 0.8
         self.epsilon_decay = 0.99
         self.buffer_size = 2000
         # Create actor and critic networks
@@ -48,20 +48,22 @@ class DDQN:
         s, a, r, d, new_s, idx = self.buffer.sample_batch(batch_size)
 
         # Apply Bellman Equation on batch samples to train our DDQN
+        q = self.agent.predict(s)
+        next_q = self.agent.predict(new_s)
+        q_targ = self.agent.target_predict(new_s)
+
         for i in range(s.shape[0]):
-            target = self.agent.predict(new_s[i])
-            q_targ = self.agent.target_predict(new_s[i])
-            old_q = target[0, a[i]]
+            old_q = q[i, a[i]]
             if d[i]:
-                target[0, a[i]] = r[i]
+                q[i, a[i]] = r[i]
             else:
-                next_best_action = np.argmax(target[0,:])
-                target[0, a[i]] = r[i] + self.gamma * q_targ[0, next_best_action]
+                next_best_action = np.argmax(next_q[0,:])
+                q[i, a[i]] = r[i] + self.gamma * q_targ[i, next_best_action]
             if(self.with_per):
                 # Update PER Sum Tree
-                self.buffer.update(idx[i], abs(old_q - target[0, a[i]]))
-            # Train on batch
-            self.agent.fit(s[i], target)
+                self.buffer.update(idx[i], abs(old_q - q[i, a[i]]))
+        # Train on batch
+        self.agent.fit(s, q)
         # Decay epsilon
         self.epsilon *= self.epsilon_decay
 
@@ -84,19 +86,17 @@ class DDQN:
                 a = self.policy_action(old_state)
                 # Retrieve new state, reward, and whether the state is terminal
                 new_state, r, done, _ = env.step(a)
-                r = r if not done else -10
                 # Memorize for experience replay
                 self.memorize(old_state, a, r, done, new_state)
                 # Update current state
                 old_state = new_state
                 cumul_reward += r
                 time += 1
-                # Transfer weights to target network
-                if(done):
-                    self.agent.transfer_weights()
-                # Train DDQN
+
+                # Train DDQN and transfer weights to target network
                 if(self.buffer.size() > args.batch_size):
                     self.train_agent(args.batch_size)
+                    self.agent.transfer_weights()
 
             # Gather stats every 50 episode for plotting
             if(args.gather_stats):
