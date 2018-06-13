@@ -83,6 +83,21 @@ $ python3 main.py --type DDPG --env LunarLanderContinuous-v2
 ## Deep Deterministic Policy Gradient with Hindsight Experience Replay (DDPG + HER)
 Hindsight Experience Replay (HER) brings an improvement to both discrete and continuous action space off-policy methods. It is particularly suited for robotics application as it enables efficient learning from _sparse_ and _binary_ rewards. HER formulates the problem as a multi-goal task, where new goals are being sampled at the start of each episode through a specific strategy.
 
+# Arguments
+
+| Arg | Description | Values |
+| :---         |     :---:      |          ---: |
+| --type         |     Type of RL Algorithm to run      |  Choose from {A2C, A3C, DDQN, DDPG} |
+| --env     | Specify the environemnt       | BreakoutNoFrameskip-v4 (default)      |
+| --nb_episodes   | Number of episodes to run     | 5000 (default)    |
+| --batch_size     | Batch Size (DDQN, DDPG)  | 32 (default)      |
+| --consecutive_frames     | Number of stacked consecutive frames       | 4 (default)      |
+| --is_atari     | Whether the environment is an Atari Game with pixel input   | -     |
+| --with_PER     | Whether to use Prioritized Experience Replay (with DDQN)      | -      |
+| --n_threads     | Number of threads (A3C)       | 16 (default)      |
+| --gather_stats     | Whether to compute stats of scores averaged over 10 games (slow, see below)       | -      |
+| --render     | Whether to render the environment as it is training       | -      |
+| --gpu     | GPU index       | 0      |
 
 # Visualization & Monitoring
 
