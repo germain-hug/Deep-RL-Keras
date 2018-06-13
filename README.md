@@ -50,55 +50,43 @@ $ pip install gym keras==2.1.6
 ### N-step Advantage Actor Critic (A2C)
 The Actor-Critic algorithm is a model-free, off-policy method where the critic acts as a value-function approximator, and the actor as a policy-function approximator. When training, the critic predicts the TD-Error and guides the learning of both itself and the actor. In practice, we approximate the TD-Error using the Advantage function. For more stability, we use a shared computational backbone across both networks, as well as an N-step formulation of the discounted rewards. We also incorporate an entropy regularization term ("soft" learning) to encourage exploration. While A2C is simple and efficient, running it on Atari Games quickly becomes intractable due to long computation time. However, one can parallelize computation using multi-threaded agents, which is the point of A3C. We test A2C on the Cartpole-V1 environment.
 
+### N-step Asynchronous Advantage Actor Critic (A3C)
+In a similar fashion as the A2C algorithm, the implementation of A3C incorporates asynchronous weight updates, allowing for much faster computation. We use multiple agents to perform gradient ascent asynchronously, over multiple threads. We test A3C on the Atari Breakout environment.
+
+### Deep Deterministic Policy Gradient (DDPG)
+The DDPG algorithm is a model-free, off-policy algorithm for continuous action spaces. Similarly to A2C, it is an actor-critic algorithm in which the actor is trained on a deterministic target policy, and the critic predicts Q-Values. In order to reduce variance and increase stability, we use experience replay and separate target networks. Moreover, as hinted by [OpenAI](https://blog.openai.com/better-exploration-with-parameter-noise/), we encourage exploration through parameter space noise (as opposed to traditional action space noise). We test DDPG on the Lunar Lander environment.
+
+### Deep Deterministic Policy Gradient with Hindsight Experience Replay (DDPG + HER)
+Hindsight Experience Replay (HER) brings an improvement to both discrete and continuous action space off-policy methods. It is particularly suited for robotics application as it enables efficient learning from _sparse_ and _binary_ rewards. HER formulates the problem as a multi-goal task, where new goals are being sampled at the start of each episode through a specific strategy.
+
 ```bash
 $ python3 main.py --type A2C --env CartPole-v1
+$ python3 main.py --type A3C --env CartPole-v1 --nb_episodes 10000 --n_threads 16
+$ python3 main.py --type A3C --env BreakoutNoFrameskip-v4 --is_atari --nb_episodes 10000 --n_threads 16
+$ python3 main.py --type DDPG --env LunarLanderContinuous-v2
+$ python3 main.py --type DDPG --env LunarLanderContinuous-v2 --with_HER
 ```
+
 <br />
 <div align="center">
 <img width="60%" src ="https://github.com/germain-hug/Advanced-Deep-RL-Keras/blob/master/results/a2c.png?raw=true" /></div>  
 <br />
 
-### N-step Asynchronous Advantage Actor Critic (A3C)
-In a similar fashion as the A2C algorithm, the implementation of A3C incorporates asynchronous weight updates, allowing for much faster computation. We use multiple agents to perform gradient ascent asynchronously, over multiple threads. We test A3C on the Atari Breakout environment.
-
-```bash
-$ python3 main.py --type A3C --env BreakoutNoFrameskip-v4 --is_atari --nb_episodes 10000 --n_threads 16
-$ python3 main.py --type A3C --env CartPole-v1 --nb_episodes 10000 --n_threads 16
-```
-
-### Deep Deterministic Policy Gradient (DDPG)
-The DDPG algorithm is a model-free, off-policy algorithm for continuous action spaces. Similarly to A2C, it is an actor-critic algorithm in which the actor is trained on a deterministic target policy, and the critic predicts Q-Values. In order to reduce variance and increase stability, we use experience replay and separate target networks. Moreover, as hinted by [OpenAI](https://blog.openai.com/better-exploration-with-parameter-noise/), we encourage exploration through parameter space noise (as opposed to traditional action space noise). We test DDPG on the Lunar Lander environment.
-
-```bash
-$ python3 main.py --type DDPG --env LunarLanderContinuous-v2
-```
-
 # Deep Q-Learning Algorithms
-### Deep Deterministic Policy Gradient with Hindsight Experience Replay (DDPG + HER)
-Hindsight Experience Replay (HER) brings an improvement to both discrete and continuous action space off-policy methods. It is particularly suited for robotics application as it enables efficient learning from _sparse_ and _binary_ rewards. HER formulates the problem as a multi-goal task, where new goals are being sampled at the start of each episode through a specific strategy.
-
 ### Double Deep Q-Network (DDQN)
 The DQN algorithm is a Q-learning algorithm, which uses a Deep Neural Network as a Q-value function approximator. We estimate target Q-values by leveraging the Bellman equation, and gather experience through an epsilon-greedy policy. For more stability, we sample past experiences randomly (Experience Replay). A variant of the DQN algorithm is the Double-DQN (or DDQN). For a more accurate estimation of our Q-values, we use a second network to temper the overestimations of the Q-values by the original network. This _target_ network is updated at a slower rate Tau, at every training step.
-
-```bash
-$ python3 main.py --type DDQN --env CartPole-v1 --batch_size 64
-```
-
-<br />
-<div align="center">
-<img width="60%" src ="https://github.com/germain-hug/Advanced-Deep-RL-Keras/blob/master/results/ddqn.png?raw=true" /></div>  
-<br />
 
 ## Double Deep Q-Network with Prioritized Experience Replay (DDQN + PER)
 We can further improve our DDQN algorithm by adding in Prioritized Experience Replay (PER), which aims at performing importance sampling on the gathered experience. The experience is ranked by its TD-Error, and stored in a SumTree structure, which allows efficient retrieval of the _(s, a, r, s')_ transitions with the highest error.
 
 ```bash
+$ python3 main.py --type DDQN --env CartPole-v1 --batch_size 64
 $ python3 main.py --type DDQN --env CartPole-v1 --batch_size 64 --with_PER
 ```
 
 <br />
 <div align="center">
-<img width="60%" src ="https://github.com/germain-hug/Advanced-Deep-RL-Keras/blob/master/results/ddqn_per.png?raw=true" /></div>  
+<img width="60%" src ="https://github.com/germain-hug/Advanced-Deep-RL-Keras/blob/master/results/ddqn.png?raw=true" /></div>  
 <p> TODO Overlay DDQN / DDQN + PER <p/>
 <br />
 
