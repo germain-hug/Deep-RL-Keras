@@ -29,6 +29,23 @@ This implementation requires keras 2.1.6, as well as OpenAI gym.
 $ pip install gym keras==2.1.6
 ```
 
+# Arguments
+
+| Argument | Description | Values |
+| :---         |     :---      |          :--- |
+| --type         |     Type of RL Algorithm to run      |  Choose from {A2C, A3C, DDQN, DDPG} |
+| --env     | Specify the environemnt       | BreakoutNoFrameskip-v4 (default)      |
+| --nb_episodes   | Number of episodes to run     | 5000 (default)    |
+| --batch_size     | Batch Size (DDQN, DDPG)  | 32 (default)      |
+| --consecutive_frames     | Number of stacked consecutive frames       | 4 (default)      |
+| --is_atari     | Whether the environment is an Atari Game with pixel input   | -     |
+| --with_PER     | Whether to use Prioritized Experience Replay (with DDQN)      | -      |
+| --n_threads     | Number of threads (A3C)       | 16 (default)      |
+| --gather_stats     | Whether to compute stats of scores averaged over 10 games (slow, see below)       | -      |
+| --render     | Whether to render the environment as it is training       | -      |
+| --gpu     | GPU index       | 0      |
+
+
 ## N-step Advantage Actor Critic (A2C)
 The Actor-Critic algorithm is a model-free, off-policy method where the critic acts as a value-function approximator, and the actor as a policy-function approximator. When training, the critic predicts the TD-Error and guides the learning of both itself and the actor. In practice, we approximate the TD-Error using the Advantage function. For more stability, we use a shared computational backbone across both networks, as well as an N-step formulation of the discounted rewards. We also incorporate an entropy regularization term ("soft" learning) to encourage exploration. While A2C is simple and efficient, running it on Atari Games quickly becomes intractable due to long computation time. However, one can parallelize computation using multi-threaded agents, which is the point of A3C. We test A2C on the Cartpole-V1 environment.
 
@@ -82,22 +99,6 @@ $ python3 main.py --type DDPG --env LunarLanderContinuous-v2
 
 ## Deep Deterministic Policy Gradient with Hindsight Experience Replay (DDPG + HER)
 Hindsight Experience Replay (HER) brings an improvement to both discrete and continuous action space off-policy methods. It is particularly suited for robotics application as it enables efficient learning from _sparse_ and _binary_ rewards. HER formulates the problem as a multi-goal task, where new goals are being sampled at the start of each episode through a specific strategy.
-
-# Arguments
-
-| Arg | Description | Values |
-| :---         |     :---:      |          ---: |
-| --type         |     Type of RL Algorithm to run      |  Choose from {A2C, A3C, DDQN, DDPG} |
-| --env     | Specify the environemnt       | BreakoutNoFrameskip-v4 (default)      |
-| --nb_episodes   | Number of episodes to run     | 5000 (default)    |
-| --batch_size     | Batch Size (DDQN, DDPG)  | 32 (default)      |
-| --consecutive_frames     | Number of stacked consecutive frames       | 4 (default)      |
-| --is_atari     | Whether the environment is an Atari Game with pixel input   | -     |
-| --with_PER     | Whether to use Prioritized Experience Replay (with DDQN)      | -      |
-| --n_threads     | Number of threads (A3C)       | 16 (default)      |
-| --gather_stats     | Whether to compute stats of scores averaged over 10 games (slow, see below)       | -      |
-| --render     | Whether to render the environment as it is training       | -      |
-| --gpu     | GPU index       | 0      |
 
 # Visualization & Monitoring
 
