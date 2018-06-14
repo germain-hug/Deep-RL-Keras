@@ -23,11 +23,15 @@ class DDQN:
         self.state_dim = (k,) + state_dim
         #
         self.lr = 1e-3
-        self.tau = 1e-2
         self.gamma = 0.99
         self.epsilon = 0.8
         self.epsilon_decay = 0.99
         self.buffer_size = 2000
+        #
+        if(len(state_dim) < 3):
+            self.tau = 1e-2
+        else:
+            self.tau = 1.0
         # Create actor and critic networks
         self.agent = Agent(self.state_dim, action_dim, self.lr, self.tau)
         # Memory Buffer for Experience Replay
@@ -94,9 +98,14 @@ class DDQN:
                 time += 1
 
                 # Train DDQN and transfer weights to target network
-                if(self.buffer.size() > args.batch_size):
+                if(len(self.state_dim) < 4 and self.buffer.size() > args.batch_size):
                     self.train_agent(args.batch_size)
                     self.agent.transfer_weights()
+
+            # Train DDQN and transfer weights to target network (Atari)
+            if(len(self.state_dim) == 4 and self.buffer.size() > args.batch_size):
+                self.train_agent(args.batch_size)
+                self.agent.transfer_weights()
 
             # Gather stats every 50 episode for plotting
             if(args.gather_stats):

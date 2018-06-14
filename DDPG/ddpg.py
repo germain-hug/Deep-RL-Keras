@@ -12,7 +12,7 @@ class DDPG:
     """ Deep Deterministic Policy Gradient (DDPG) Helper Class
     """
 
-    def __init__(self, act_dim, env_dim, act_range, k, buffer_size = 200000, gamma = 0.99, lr = 0.0002, tau = 0.001):
+    def __init__(self, act_dim, env_dim, act_range, k, buffer_size = 200000, gamma = 0.99, lr = 0.001, tau = 0.001):
         """ Initialization
         """
         # Environment and A2C parameters

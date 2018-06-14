@@ -19,8 +19,7 @@ def conv_layer(d, k):
     return Conv2D(d, k, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal')
 
 def conv_block(inp, d=3, pool_size=(2, 2), k=3):
-    """ Returns a 2D Conv block, with a convolutional layer, max-pooling,
-    dropout and batch-normalization
+    """ Returns a 2D Conv block, with a convolutional layer, max-pooling
     """
     conv = conv_layer(d, k)(inp)
     return MaxPooling2D(pool_size=pool_size)(conv)
