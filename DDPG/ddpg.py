@@ -12,7 +12,7 @@ class DDPG:
     """ Deep Deterministic Policy Gradient (DDPG) Helper Class
     """
 
-    def __init__(self, act_dim, env_dim, act_range, k, buffer_size = 200000, gamma = 0.99, lr = 0.001, tau = 0.001):
+    def __init__(self, act_dim, env_dim, act_range, k, buffer_size = 200000, gamma = 0.99, lr = 0.0002, tau = 0.001):
         """ Initialization
         """
         # Environment and A2C parameters
@@ -74,15 +74,11 @@ class DDPG:
             time, cumul_reward, done = 0, 0, False
             old_state = env.reset()
             actions, states, rewards = [], [], []
-            ou_noise = np.ones((self.act_dim)) * 0.15
 
             while not done:
                 if args.render: env.render()
                 # Actor picks an action (following the deterministic policy)
                 a = self.policy_action(old_state)
-                # Ornstein Uhlenbeck Process (Action Noise)
-                ou_noise = - 0.15 * ou_noise + 0.3 * np.random.randn(self.act_dim)
-                a = a + ou_noise
                 # Clip continuous values to be valid w.r.t. environment
                 a = np.clip(a, -self.act_range, self.act_range)
                 # Retrieve new state, reward, and whether the state is terminal

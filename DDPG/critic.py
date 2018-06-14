@@ -37,7 +37,7 @@ class Critic:
         #
         x = concatenate([Flatten()(x1), x2])
         x = Dense(32, activation='relu')(x)
-        x = BatchNormalization()(x)
+        #x = BatchNormalization()(x)
         out = Dense(1, activation='linear')(x)
         return Model([state, action], out)
 
