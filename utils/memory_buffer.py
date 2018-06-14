@@ -23,7 +23,7 @@ class MemoryBuffer(object):
         self.with_per = with_per
         self.buffer_size = buffer_size
 
-    def memorize(self, state, action, reward, done, new_state, error):
+    def memorize(self, state, action, reward, done, new_state, error=None):
         """ Save an experience to memory, optionally with its TD-Error
         """
 
