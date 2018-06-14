@@ -30,22 +30,15 @@ class DDPG:
         """
         return self.actor.predict(s)[0]
 
-    def target_critic_predict(self, s, a):
-        """ Predict Q-Values using the target network
-        """
-        return self.critic.target_predict([s, a])
-
-    def target_actor_predict(self, s):
-        """ Predict Actions using the target network
-        """
-        return self.actor.target_predict(s)
-
     def bellman(self, rewards, q_values, dones):
         """ Use the Bellman Equation to compute the critic target
         """
         critic_target = np.asarray(q_values)
         for i in range(q_values.shape[0]):
-            critic_target[i] = rewards[i] + self.gamma * q_values[i] * dones[i]
+            if dones[i]:
+                critic_target[i] = rewards[i]
+            else:
+                critic_target[i] = rewards[i] + self.gamma * q_values[i] * dones[i]
         return critic_target
 
     def memorize(self, state, action, reward, done, new_state):
@@ -87,18 +80,19 @@ class DDPG:
                 if args.render: env.render()
                 # Actor picks an action (following the deterministic policy)
                 a = self.policy_action(old_state)
-                # Clip continuous values to be valid w.r.t. environment
+                # Ornstein Uhlenbeck Process (Action Noise)
                 ou_noise = - 0.15 * ou_noise + 0.3 * np.random.randn(self.act_dim)
-                #a = a + ou_noise
+                a = a + ou_noise
+                # Clip continuous values to be valid w.r.t. environment
                 a = np.clip(a, -self.act_range, self.act_range)
                 # Retrieve new state, reward, and whether the state is terminal
                 new_state, r, done, _ = env.step(a)
                 # Add outputs to memory buffer
                 self.memorize(old_state, a, r, done, new_state)
                 # Sample experience from buffer
-                states, actions, rewards, dones, new_states = self.sample_batch(args.batch_size)
+                states, actions, rewards, dones, new_states, _ = self.sample_batch(args.batch_size)
                 # Predict target q-values using target networks
-                q_values = self.target_critic_predict(new_states, self.target_actor_predict(new_states))
+                q_values = self.critic.target_predict([new_states, self.actor.target_predict(new_states)])
                 # Compute critic target
                 critic_target = self.bellman(rewards, q_values, dones)
                 # Train both networks on sampled batch, update target networks
