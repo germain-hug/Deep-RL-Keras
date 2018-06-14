@@ -51,7 +51,6 @@ class Agent:
         for i in range(len(W)):
             tgt_W[i] = self.tau * W[i] + (1 - self.tau) * tgt_W[i]
         self.target_model.set_weights(tgt_W)
-        # self.target_model.set_weights(self.model.get_weights())
 
     def fit(self, inp, targ):
         """ Perform one epoch of training
