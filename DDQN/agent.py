@@ -4,7 +4,7 @@ import keras.backend as K
 
 from keras.models import Model
 from keras.optimizers import Adam
-from keras.layers import Input, Dense, Flatten, Reshape, LSTM
+from keras.layers import Input, Dense, Flatten, Reshape, LSTM, Lambda
 from keras.regularizers import l2
 from utils.networks import conv_block
 
@@ -12,25 +12,27 @@ class Agent:
     """ Agent Class (Network) for DDQN
     """
 
-    def __init__(self, state_dim, action_dim, lr, tau):
+    def __init__(self, state_dim, action_dim, lr, tau, dueling):
         self.state_dim = state_dim
         self.action_dim = action_dim
         self.tau = tau
         # Initialize Deep Q-Network
-        self.model = self.network()
+        self.model = self.network(dueling)
         self.model.compile(Adam(lr), 'mse')
         # Build target Q-Network
-        self.target_model = self.network()
+        self.target_model = self.network(dueling)
         self.target_model.compile(Adam(lr), 'mse')
         self.target_model.set_weights(self.model.get_weights())
 
     def huber_loss(self, y_true, y_pred):
         return K.mean(K.sqrt(1 + K.square(y_pred - y_true)) - 1, axis=-1)
 
-    def network(self):
+    def network(self, dueling):
         """ Build Deep Q-Network
         """
         inp = Input((self.state_dim))
+
+        # Determine whether we are dealing with an image input (Atari) or not
         if(len(self.state_dim) > 2):
             inp = Input((self.state_dim[1:]))
             x = conv_block(inp, 16, (4, 4), 8)
@@ -42,7 +44,13 @@ class Agent:
             x = Flatten()(inp)
             x = Dense(64, activation='relu')(x)
             x = Dense(64, activation='relu')(x)
-        x = Dense(self.action_dim, activation='linear')(x)
+
+        if(dueling):
+            # Have the network estimate the Advantage function as an intermediate layer
+            x = Dense(self.action_dim + 1, activation='linear')(x)
+            x = Lambda(lambda i: K.expand_dims(i[:,0],-1) + i[:,1:] - K.mean(i[:,1:], keepdims=True), output_shape=(self.action_dim,))(x)
+        else:
+            x = Dense(self.action_dim, activation='linear')(x)
         return Model(inp, x)
 
     def transfer_weights(self):

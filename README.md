@@ -7,8 +7,8 @@ Modular Implementation of popular Deep Reinforcement Learning algorithms in Kera
 - [ ] Deep Deterministic Policy Gradient with Parameter Noise ([DDPG](https://github.com/germain-hug/Advanced-Deep-RL-Keras#deep-deterministic-policy-gradient-ddpg))
 - [ ] Deep Deterministic Policy Gradient with Hindsight Experience Replay ([DDPG + HER](https://github.com/germain-hug/Advanced-Deep-RL-Keras#deep-deterministic-policy-gradient-with-hindsight-experience-replay-ddpg--her))
 - [x] Double Deep Q-Network ([DDQN](https://github.com/germain-hug/Advanced-Deep-RL-Keras#double-deep-q-network-ddqn))
-- [x] Double Deep Q-Network with Prioritized Experience Replay  ([DDQN + PER](https://github.com/germain-hug/Advanced-Deep-RL-Keras#deep-deterministic-policy-gradient-with-hindsight-experience-replay-ddpg--her))
-- [ ] Dueling DDQN (DDQN)
+- [x] Double Deep Q-Network with Prioritized Experience Replay  ([DDQN + PER](https://github.com/germain-hug/Advanced-Deep-RL-Keras#))
+- [x] Dueling DDQN ([DDQN](https://github.com/germain-hug/Advanced-Deep-RL-Keras#dueling-double-deep-q-network-dueling-ddqn))
 - [ ] Rainbow
 - [ ] REINFORCE
 - [ ] DYNA-Q
@@ -79,9 +79,13 @@ The DQN algorithm is a Q-learning algorithm, which uses a Deep Neural Network as
 ### Double Deep Q-Network with Prioritized Experience Replay (DDQN + PER)
 We can further improve our DDQN algorithm by adding in Prioritized Experience Replay (PER), which aims at performing importance sampling on the gathered experience. The experience is ranked by its TD-Error, and stored in a SumTree structure, which allows efficient retrieval of the _(s, a, r, s')_ transitions with the highest error.
 
+### Dueling Double Deep Q-Network (Dueling DDQN)
+In the dueling variant of the DQN, we incorporate an intermediate layer in the Q-Network to estimate both the state value and the state-dependent advantage function. After reformulation (see [ref](https://arxiv.org/pdf/1511.06581.pdf)), it turns out we can express the estimated Q-Value as the state value, to which we add the advantage estimate and subtract its mean. This factorization of state-independent and state-dependent values helps disentangling learning across actions and yields better results.
+
 ```bash
 $ python3 main.py --type DDQN --env CartPole-v1 --batch_size 64
 $ python3 main.py --type DDQN --env CartPole-v1 --batch_size 64 --with_PER
+$ python3 main.py --type DDQN --env CartPole-v1 --batch_size 64 --dueling
 ```
 
 <br />
@@ -128,3 +132,4 @@ python3 utils/plot_results.py <path_to_your_log_file>
 - [Deep Q-Learning](https://www.cs.toronto.edu/~vmnih/docs/dqn.pdf)
 - [Double Q-Learning](https://arxiv.org/pdf/1509.06461.pdf)
 - [Prioritized Experience Replay](https://arxiv.org/pdf/1511.05952.pdf)
+- [Dueling Network Architectures](https://arxiv.org/pdf/1511.06581.pdf)
