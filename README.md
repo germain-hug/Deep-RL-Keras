@@ -4,17 +4,12 @@ Modular Implementation of popular Deep Reinforcement Learning algorithms in Kera
 
 - [x] Synchronous N-step Advantage Actor Critic ([A2C](https://github.com/germain-hug/Advanced-Deep-RL-Keras#n-step-advantage-actor-critic-a2c))
 - [x] Asynchronous N-step Advantage Actor-Critic ([A3C](https://github.com/germain-hug/Advanced-Deep-RL-Keras#n-step-asynchronous-advantage-actor-critic-a3c))
-- [ ] Deep Deterministic Policy Gradient with Parameter Noise ([DDPG](https://github.com/germain-hug/Advanced-Deep-RL-Keras#deep-deterministic-policy-gradient-ddpg))
-- [ ] Deep Deterministic Policy Gradient with Hindsight Experience Replay ([DDPG + HER](https://github.com/germain-hug/Advanced-Deep-RL-Keras#deep-deterministic-policy-gradient-with-hindsight-experience-replay-ddpg--her))
+- [x] Deep Deterministic Policy Gradient with Parameter Noise ([DDPG](https://github.com/germain-hug/Advanced-Deep-RL-Keras#deep-deterministic-policy-gradient-ddpg))
 - [x] Double Deep Q-Network ([DDQN](https://github.com/germain-hug/Advanced-Deep-RL-Keras#double-deep-q-network-ddqn))
 - [x] Double Deep Q-Network with Prioritized Experience Replay  ([DDQN + PER](https://github.com/germain-hug/Advanced-Deep-RL-Keras#))
-- [x] Dueling DDQN ([DDQN](https://github.com/germain-hug/Advanced-Deep-RL-Keras#dueling-double-deep-q-network-dueling-ddqn))
+- [x] Dueling DDQN ([D3QN](https://github.com/germain-hug/Advanced-Deep-RL-Keras#dueling-double-deep-q-network-dueling-ddqn))
 - [ ] Rainbow
-- [ ] REINFORCE
-- [ ] DYNA-Q
 - [ ] Proximal Policy Optimization (PPO)
-- [ ] Impala
-- [ ] Spiral
 
 ## Getting Started
 
@@ -25,10 +20,10 @@ $ pip install gym keras==2.1.6
 
 ### Arguments
 
-| Argument | Description | Values |
+| Argument &nbsp; &nbsp; &nbsp; &nbsp; | Description | Values |
 | :---         |     :---      |          :--- |
 | --type         |     Type of RL Algorithm to run      |  Choose from {A2C, A3C, DDQN, DDPG} |
-| --env     | Specify the environemnt       | BreakoutNoFrameskip-v4 (default)      |
+| --env     | Specify the environment       | BreakoutNoFrameskip-v4 (default)      |
 | --nb_episodes   | Number of episodes to run     | 5000 (default)    |
 | --batch_size     | Batch Size (DDQN, DDPG)  | 32 (default)      |
 | --consecutive_frames     | Number of stacked consecutive frames       | 4 (default)      |
@@ -56,15 +51,13 @@ In a similar fashion as the A2C algorithm, the implementation of A3C incorporate
 ### Deep Deterministic Policy Gradient (DDPG)
 The DDPG algorithm is a model-free, off-policy algorithm for continuous action spaces. Similarly to A2C, it is an actor-critic algorithm in which the actor is trained on a deterministic target policy, and the critic predicts Q-Values. In order to reduce variance and increase stability, we use experience replay and separate target networks. Moreover, as hinted by [OpenAI](https://blog.openai.com/better-exploration-with-parameter-noise/), we encourage exploration through parameter space noise (as opposed to traditional action space noise). We test DDPG on the Lunar Lander environment.
 
-### Deep Deterministic Policy Gradient with Hindsight Experience Replay (DDPG + HER)
-Hindsight Experience Replay (HER) brings an improvement to both discrete and continuous action space off-policy methods. It is particularly suited for robotics application as it enables efficient learning from _sparse_ and _binary_ rewards. HER formulates the problem as a multi-goal task, where new goals are being sampled at the start of each episode through a specific strategy.
+### Running
 
 ```bash
 $ python3 main.py --type A2C --env CartPole-v1
 $ python3 main.py --type A3C --env CartPole-v1 --nb_episodes 10000 --n_threads 16
 $ python3 main.py --type A3C --env BreakoutNoFrameskip-v4 --is_atari --nb_episodes 10000 --n_threads 16
 $ python3 main.py --type DDPG --env LunarLanderContinuous-v2
-$ python3 main.py --type DDPG --env LunarLanderContinuous-v2 --with_HER
 ```
 
 <br />
@@ -81,6 +74,8 @@ We can further improve our DDQN algorithm by adding in Prioritized Experience Re
 
 ### Dueling Double Deep Q-Network (Dueling DDQN)
 In the dueling variant of the DQN, we incorporate an intermediate layer in the Q-Network to estimate both the state value and the state-dependent advantage function. After reformulation (see [ref](https://arxiv.org/pdf/1511.06581.pdf)), it turns out we can express the estimated Q-Value as the state value, to which we add the advantage estimate and subtract its mean. This factorization of state-independent and state-dependent values helps disentangling learning across actions and yields better results.
+
+### Running
 
 ```bash
 $ python3 main.py --type DDQN --env CartPole-v1 --batch_size 64
@@ -129,7 +124,7 @@ python3 utils/plot_results.py <path_to_your_log_file>
 - [Asynchronous Advantage Actor Critic (A3C)](https://arxiv.org/pdf/1602.01783.pdf)
 - [Deep Deterministic Policy Gradient (DDPG)](http://proceedings.mlr.press/v32/silver14.pdf)
 - [Hindsight Experience Replay (HER)](https://arxiv.org/pdf/1707.01495.pdf)
-- [Deep Q-Learning](https://www.cs.toronto.edu/~vmnih/docs/dqn.pdf)
-- [Double Q-Learning](https://arxiv.org/pdf/1509.06461.pdf)
-- [Prioritized Experience Replay](https://arxiv.org/pdf/1511.05952.pdf)
-- [Dueling Network Architectures](https://arxiv.org/pdf/1511.06581.pdf)
+- [Deep Q-Learning (DQN)](https://www.cs.toronto.edu/~vmnih/docs/dqn.pdf)
+- [Double Q-Learning (DDQN)](https://arxiv.org/pdf/1509.06461.pdf)
+- [Prioritized Experience Replay (PER)](https://arxiv.org/pdf/1511.05952.pdf)
+- [Dueling Network Architectures (D3QN)](https://arxiv.org/pdf/1511.06581.pdf)
