@@ -35,9 +35,9 @@ class Agent:
         # Determine whether we are dealing with an image input (Atari) or not
         if(len(self.state_dim) > 2):
             inp = Input((self.state_dim[1:]))
-            x = conv_block(inp, 16, (4, 4), 8)
-            x = conv_block(x, 32, (2, 2), 4)
+            x = conv_block(inp, 32, (2, 2), 8)
             x = conv_block(x, 64, (2, 2), 4)
+            x = conv_block(x, 64, (2, 2), 3)
             x = Flatten()(x)
             x = Dense(256, activation='relu')(x)
         else:

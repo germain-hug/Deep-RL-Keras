@@ -22,11 +22,11 @@ class DDQN:
         self.action_dim = action_dim
         self.state_dim = (args.consecutive_frames,) + state_dim
         #
-        self.lr = 1e-3
-        self.gamma = 0.99
+        self.lr = 2.5e-4
+        self.gamma = 0.95
         self.epsilon = 0.8
         self.epsilon_decay = 0.99
-        self.buffer_size = 2000
+        self.buffer_size = 20000
         #
         if(len(state_dim) < 3):
             self.tau = 1e-2
@@ -96,18 +96,12 @@ class DDQN:
                 old_state = new_state
                 cumul_reward += r
                 time += 1
-
                 # Train DDQN and transfer weights to target network
-                if(len(self.state_dim) < 4 and self.buffer.size() > args.batch_size):
+                if(if self.buffer.size() > args.batch_size):
                     self.train_agent(args.batch_size)
                     self.agent.transfer_weights()
 
-            # Train DDQN and transfer weights to target network (Atari)
-            if(len(self.state_dim) == 4 and self.buffer.size() > args.batch_size):
-                self.train_agent(args.batch_size)
-                self.agent.transfer_weights()
-
-            # Gather stats every 50 episode for plotting
+            # Gather stats every episode for plotting
             if(args.gather_stats):
                 mean, stdev = gather_stats(self, env)
                 results.append([e, mean, stdev])

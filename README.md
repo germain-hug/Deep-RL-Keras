@@ -29,6 +29,7 @@ $ pip install gym keras==2.1.6
 | --consecutive_frames     | Number of stacked consecutive frames       | 4 (default)      |
 | --is_atari     | Whether the environment is an Atari Game with pixel input   | -     |
 | --with_PER     | Whether to use Prioritized Experience Replay (with DDQN)      | -      |
+| --dueling     | Whether to use Dueling Networks (with DDQN)      | -      |
 | --n_threads     | Number of threads (A3C)       | 16 (default)      |
 | --gather_stats     | Whether to compute stats of scores averaged over 10 games (slow, see below)       | -      |
 | --render     | Whether to render the environment as it is training       | -      |
@@ -97,7 +98,7 @@ Using tensorboard, you can monitor the agent's score as it is training. When tra
 $ tensorboard --logdir=A2C/tensorboard_CartPole-v1/
 ```
 ### Results plotting
-When training with the argument --gather_stats, a log file is generated containing scores averaged over 10 games at every episode: `logs.csv`. Using [plotly](https://plot.ly/), you can visualize the average reward per episode.
+When training with the argument`--gather_stats`, a log file is generated containing scores averaged over 10 games at every episode: `logs.csv`. Using [plotly](https://plot.ly/), you can visualize the average reward per episode.
 To do so, you will first need to install plotly and get a [free licence](https://plot.ly/python/getting-started/).
 ```bash
 pip3 install plotly
