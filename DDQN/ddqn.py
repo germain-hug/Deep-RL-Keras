@@ -97,7 +97,7 @@ class DDQN:
                 cumul_reward += r
                 time += 1
                 # Train DDQN and transfer weights to target network
-                if(if self.buffer.size() > args.batch_size):
+                if(self.buffer.size() > args.batch_size):
                     self.train_agent(args.batch_size)
                     self.agent.transfer_weights()
 
