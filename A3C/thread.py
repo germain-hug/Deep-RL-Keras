@@ -8,7 +8,7 @@ from utils.networks import tfSummary
 
 episode = 0
 
-def training_thread(agent, Nmax, env, action_dim, k, f, summary_writer, tqdm, factor):
+def training_thread(agent, Nmax, env, action_dim, f, summary_writer, tqdm, factor):
     """ Build threads to run shared computation across
     """
 

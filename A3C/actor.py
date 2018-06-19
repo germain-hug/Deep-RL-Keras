@@ -10,15 +10,13 @@ class Actor(Agent):
     """ Actor for the A2C Algorithm
     """
 
-    def __init__(self, inp_dim, out_dim, network, network_tgt, lr):
+    def __init__(self, inp_dim, out_dim, network, lr):
         Agent.__init__(self, inp_dim, out_dim, lr)
         self.model = self.addHead(network)
-        self.target_model = self.addHead(network_tgt)
         self.action_pl = K.placeholder(shape=(None, self.out_dim))
         self.advantages_pl = K.placeholder(shape=(None,))
         # Pre-compile for threading
         self.model._make_predict_function()
-        self.target_model._make_predict_function()
 
     def addHead(self, network):
         """ Assemble Actor network to predict probability of each action

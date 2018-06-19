@@ -7,12 +7,13 @@ import numpy as np
 from tqdm import tqdm
 from keras.models import Model
 from keras import regularizers
-from keras.layers import Input, Dense, Flatten
+from keras.layers import Input, Dense, Flatten, Reshape
 
 from .critic import Critic
 from .actor import Actor
 from .thread import training_thread
 from utils.atari_environment import AtariEnvironment
+from utils.continuous_environments import Environment
 from utils.networks import conv_block
 from utils.stats import gather_stats
 
@@ -20,19 +21,17 @@ class A3C:
     """ Asynchronous Actor-Critic Main Algorithm
     """
 
-    def __init__(self, act_dim, env_dim, gamma = 0.99, lr = 0.0001):
+    def __init__(self, act_dim, env_dim, k, gamma = 0.99, lr = 0.0001):
         """ Initialization
         """
         # Environment and A2C parameters
         self.act_dim = act_dim
-        self.env_dim = env_dim
+        self.env_dim = (k,) + env_dim
         self.gamma = gamma
         # Create actor and critic networks
         self.shared = self.buildNetwork()
-        self.shared_target = self.buildNetwork()
-        self.shared_target.set_weights(self.shared.get_weights())
-        self.actor = Actor(env_dim, act_dim, self.shared, self.shared_target, lr)
-        self.critic = Critic(env_dim, act_dim, self.shared, self.shared_target, lr)
+        self.actor = Actor(self.env_dim, act_dim, self.shared, lr)
+        self.critic = Critic(self.env_dim, act_dim, self.shared, lr)
         # Build optimizers
         self.a_opt = self.actor.optimizer()
         self.c_opt = self.critic.optimizer()
@@ -43,16 +42,18 @@ class A3C:
         inp = Input((self.env_dim))
         # If we have an image, apply convolutional layers
         if(len(self.env_dim) > 2):
-            x = conv_block(inp, 32, (2, 2))
+            x = Reshape((self.env_dim[1], self.env_dim[2], -1))(inp)
+            x = conv_block(x, 32, (2, 2))
             x = conv_block(x, 32, (2, 2))
             x = Flatten()(x)
         else:
-            x = Dense(64, activation='relu')(inp)
+            x = Flatten()(inp)
+            x = Dense(64, activation='relu')(x)
             x = Dense(128, activation='relu')(x)
         return Model(inp, x)
 
     def policy_action(self, s):
-        """ Use the actor's target network to predict the next action to take, using the policy
+        """ Use the actor's network to predict the next action to take, using the policy
         """
         return np.random.choice(np.arange(self.act_dim), 1, p=self.actor.predict(s).ravel())[0]
 
@@ -75,9 +76,6 @@ class A3C:
         # Networks optimization
         self.a_opt([states, actions, advantages])
         self.c_opt([states, discounted_rewards])
-        # Transfer weights to target network
-        # self.actor.transfer_weights()
-        # self.critic.transfer_weights()
 
     def train(self, env, args, summary_writer):
 
@@ -87,9 +85,10 @@ class A3C:
             state_dim = envs[0].get_state_size()
             action_dim = envs[0].get_action_size()
         else:
-            envs = [gym.make(args.env) for i in range(args.n_threads)]
-            state_dim = envs[0].observation_space.shape
-            action_dim = envs[0].action_space.n
+            envs = [Environment(gym.make(args.env), args.consecutive_frames) for i in range(args.n_threads)]
+            [e.reset() for e in envs]
+            state_dim = envs[0].get_state_size()
+            action_dim = gym.make(args.env).action_space.n
 
         # Create threads
         factor = 100.0 / (args.nb_episodes)
@@ -101,7 +100,6 @@ class A3C:
                     args.nb_episodes,
                     envs[i],
                     action_dim,
-                    args.consecutive_frames,
                     args.training_interval,
                     summary_writer,
                     tqdm_e,

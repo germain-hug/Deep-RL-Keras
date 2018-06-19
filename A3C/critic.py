@@ -10,14 +10,12 @@ class Critic(Agent):
     """ Critic for the A3C Algorithm
     """
 
-    def __init__(self, inp_dim, out_dim, network, network_tgt, lr):
+    def __init__(self, inp_dim, out_dim, network, lr):
         Agent.__init__(self, inp_dim, out_dim, lr)
         self.model = self.addHead(network)
-        self.target_model = self.addHead(network_tgt)
         self.discounted_r = K.placeholder(shape=(None,))
         # Pre-compile for threading
         self.model._make_predict_function()
-        self.target_model._make_predict_function()
 
     def addHead(self, network):
         """ Assemble Critic network to predict value of each state
