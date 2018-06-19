@@ -98,8 +98,8 @@ class A2C:
             # Train using discounted rewards ie. compute updates
             self.train_models(states, actions, rewards, done)
 
-            # Gather stats every 50 episode for plotting
-            if(e%50==0 and args.gather_stats):
+            # Gather stats every episode for plotting
+            if(args.gather_stats):
                 mean, stdev = gather_stats(self, env)
                 results.append([e, mean, stdev])
 
