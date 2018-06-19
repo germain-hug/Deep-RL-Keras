@@ -88,7 +88,7 @@ def main(args=None):
     elif(args.type=="A2C"):
         algo = A2C(action_dim, state_dim, args.consecutive_frames)
     elif(args.type=="A3C"):
-        algo = A3C(action_dim, state_dim)
+        algo = A3C(action_dim, state_dim, args.consecutive_frames)
     elif(args.type=="DDPG"):
         algo = DDPG(action_dim, state_dim, act_range, args.consecutive_frames)
 
