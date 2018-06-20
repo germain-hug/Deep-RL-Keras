@@ -2,7 +2,7 @@ import numpy as np
 import tensorflow as tf
 import keras.backend as K
 
-from keras.regularizers import l2
+from keras.initializers import RandomUniform
 from keras.models import Model, load_model
 from keras.optimizers import Adam
 from keras.layers import Input, Dense, concatenate, LSTM, Reshape, BatchNormalization, Lambda, Flatten
@@ -29,16 +29,10 @@ class Critic:
         """
         state = Input((self.env_dim))
         action = Input((self.act_dim,))
-        x1 = Dense(400, activation='relu')(state)
-        x1 = BatchNormalization()(x1)
-        #
-        x2 = Dense(300, activation='relu')(action)
-        x2 = BatchNormalization()(x2)
-        #
-        x = concatenate([Flatten()(x1), x2])
-        x = Dense(32, activation='relu')(x)
-        #x = BatchNormalization()(x)
-        out = Dense(1, activation='linear')(x)
+        x = Dense(256, activation='relu')(state)
+        x = concatenate([Flatten()(x), action])
+        x = Dense(128, activation='relu')(x)
+        out = Dense(1, activation='linear', kernel_initializer=RandomUniform())(x)
         return Model([state, action], out)
 
     def gradients(self, states, actions):

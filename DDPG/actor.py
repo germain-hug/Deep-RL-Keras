@@ -2,7 +2,7 @@ import numpy as np
 import tensorflow as tf
 import keras.backend as K
 
-from keras.regularizers import l2
+from keras.initializers import RandomUniform
 from keras.models import Model, load_model
 from keras.layers import Input, Dense, Reshape, LSTM, Lambda, BatchNormalization, GaussianNoise, Flatten
 
@@ -27,14 +27,14 @@ class Actor:
         """
         inp = Input((self.env_dim))
         #
-        x = Dense(400, activation='relu')(inp)
+        x = Dense(256, activation='relu')(inp)
         x = GaussianNoise(1.0)(x)
         #
         x = Flatten()(x)
-        x = Dense(300, activation='relu')(x)
+        x = Dense(128, activation='relu')(x)
         x = GaussianNoise(1.0)(x)
         #
-        out = Dense(self.act_dim, activation='tanh')(x)
+        out = Dense(self.act_dim, activation='tanh', kernel_initializer=RandomUniform())(x)
         out = Lambda(lambda i: i * self.act_range)(out)
         #
         return Model(inp, out)

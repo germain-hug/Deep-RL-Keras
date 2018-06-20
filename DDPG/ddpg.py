@@ -5,14 +5,14 @@ from tqdm import tqdm
 from .actor import Actor
 from .critic import Critic
 from utils.stats import gather_stats
-from utils.networks import tfSummary
+from utils.networks import tfSummary, OrnsteinUhlenbeckProcess
 from utils.memory_buffer import MemoryBuffer
 
 class DDPG:
     """ Deep Deterministic Policy Gradient (DDPG) Helper Class
     """
 
-    def __init__(self, act_dim, env_dim, act_range, k, buffer_size = 20000, gamma = 0.99, lr = 0.001, tau = 0.001):
+    def __init__(self, act_dim, env_dim, act_range, k, buffer_size = 20000, gamma = 0.99, lr = 0.0001, tau = 0.001):
         """ Initialization
         """
         # Environment and A2C parameters
@@ -38,7 +38,7 @@ class DDPG:
             if dones[i]:
                 critic_target[i] = rewards[i]
             else:
-                critic_target[i] = rewards[i] + self.gamma * q_values[i] * dones[i]
+                critic_target[i] = rewards[i] + self.gamma * q_values[i]
         return critic_target
 
     def memorize(self, state, action, reward, done, new_state):
@@ -74,13 +74,14 @@ class DDPG:
             time, cumul_reward, done = 0, 0, False
             old_state = env.reset()
             actions, states, rewards = [], [], []
+            noise = OrnsteinUhlenbeckProcess(size=self.act_dim)
 
             while not done:
                 if args.render: env.render()
                 # Actor picks an action (following the deterministic policy)
                 a = self.policy_action(old_state)
                 # Clip continuous values to be valid w.r.t. environment
-                a = np.clip(a, -self.act_range, self.act_range)
+                a = np.clip(a+noise.generate(time), -self.act_range, self.act_range)
                 # Retrieve new state, reward, and whether the state is terminal
                 new_state, r, done, _ = env.step(a)
                 # Add outputs to memory buffer
