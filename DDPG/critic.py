@@ -29,10 +29,10 @@ class Critic:
         """
         state = Input((self.env_dim))
         action = Input((self.act_dim,))
-        x1 = Dense(64, activation='relu')(state)
+        x1 = Dense(400, activation='relu')(state)
         x1 = BatchNormalization()(x1)
         #
-        x2 = Dense(64, activation='relu')(action)
+        x2 = Dense(300, activation='relu')(action)
         x2 = BatchNormalization()(x2)
         #
         x = concatenate([Flatten()(x1), x2])

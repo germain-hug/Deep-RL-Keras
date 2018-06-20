@@ -87,7 +87,6 @@ $ python3 main.py --type DDQN --env CartPole-v1 --batch_size 64 --dueling
 <br />
 <div align="center">
 <img width="60%" src ="https://github.com/germain-hug/Advanced-Deep-RL-Keras/blob/master/results/ddqn.png?raw=true" /></div>  
-<p> TODO Overlay DDQN / DDQN + PER <p/>
 <br />
 
 # Visualization & Monitoring
