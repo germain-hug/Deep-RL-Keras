@@ -64,6 +64,7 @@ $ python3 main.py --type DDPG --env LunarLanderContinuous-v2
 <br />
 <div align="center">
 <img width="60%" src ="https://github.com/germain-hug/Advanced-Deep-RL-Keras/blob/master/results/a2c.png?raw=true" /></div>  
+<img width="60%" src ="https://github.com/germain-hug/Advanced-Deep-RL-Keras/blob/master/results/ddpg.png?raw=true" /></div>  
 <br />
 
 # Deep Q-Learning Algorithms
