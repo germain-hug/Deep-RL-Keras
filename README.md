@@ -1,4 +1,4 @@
-# Advanced Deep RL in Keras
+# Deep Reinforcement Learning in Keras
 
 Modular Implementation of popular Deep Reinforcement Learning algorithms in Keras:
 
