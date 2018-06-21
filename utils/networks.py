@@ -15,7 +15,7 @@ def tfSummary(tag, val):
     return tf.Summary(value=[tf.Summary.Value(tag=tag, simple_value=val)])
 
 def conv_layer(d, k):
-    """ Returns a 2D Conv layer, with L2-regularization and ReLU activation
+    """ Returns a 2D Conv layer, with and ReLU activation
     """
     return Conv2D(d, k, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal')
 
