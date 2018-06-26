@@ -66,12 +66,6 @@ $ python3 main.py --type DDQN --env CartPole-v1 --batch_size 64 --dueling
 <img width="60%" src ="https://github.com/germain-hug/Advanced-Deep-RL-Keras/blob/master/results/ddqn.png?raw=true" /></div>  
 <br />
 
-<br />
-<div align="center">
-<img width="30%" src ="https://github.com/germain-hug/Advanced-Deep-RL-Keras/blob/master/results/a2c.gif?raw=true" />
-<p style="text-align=center";> Results </p></div>  
-<br />
-
 ### Arguments
 
 | Argument &nbsp; &nbsp; &nbsp; &nbsp; | Description | Values |
