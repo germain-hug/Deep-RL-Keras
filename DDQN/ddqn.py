@@ -61,7 +61,7 @@ class DDQN:
             if d[i]:
                 q[i, a[i]] = r[i]
             else:
-                next_best_action = np.argmax(next_q[0,:])
+                next_best_action = np.argmax(next_q[i,:])
                 q[i, a[i]] = r[i] + self.gamma * q_targ[i, next_best_action]
             if(self.with_per):
                 # Update PER Sum Tree
