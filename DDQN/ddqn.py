@@ -122,7 +122,7 @@ class DDQN:
         """
 
         if(self.with_per):
-            q_val = self.agent.predict(new_state)
+            q_val = self.agent.predict(state)
             q_val_t = self.agent.target_predict(new_state)
             next_best_action = np.argmax(q_val)
             new_val = reward + self.gamma * q_val_t[0, next_best_action]
