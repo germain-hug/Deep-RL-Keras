@@ -8,8 +8,6 @@ Modular Implementation of popular Deep Reinforcement Learning algorithms in Kera
 - [x] Double Deep Q-Network ([DDQN](https://github.com/germain-hug/Advanced-Deep-RL-Keras#double-deep-q-network-ddqn))
 - [x] Double Deep Q-Network with Prioritized Experience Replay  ([DDQN + PER](https://github.com/germain-hug/Advanced-Deep-RL-Keras#))
 - [x] Dueling DDQN ([D3QN](https://github.com/germain-hug/Advanced-Deep-RL-Keras#dueling-double-deep-q-network-dueling-ddqn))
-- [ ] Rainbow
-- [ ] Proximal Policy Optimization (PPO)
 
 ## Getting Started
 
