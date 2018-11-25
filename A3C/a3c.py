@@ -21,12 +21,15 @@ class A3C:
     """ Asynchronous Actor-Critic Main Algorithm
     """
 
-    def __init__(self, act_dim, env_dim, k, gamma = 0.99, lr = 0.0001):
+    def __init__(self, act_dim, env_dim, k, gamma = 0.99, lr = 0.0001, is_atari=False):
         """ Initialization
         """
-        # Environment and A2C parameters
+        # Environment and A3C parameters
         self.act_dim = act_dim
-        self.env_dim = (k,) + env_dim
+        if(is_atari):
+            self.env_dim = env_dim
+        else:
+            self.env_dim = (k,) + env_dim
         self.gamma = gamma
         # Create actor and critic networks
         self.shared = self.buildNetwork()
