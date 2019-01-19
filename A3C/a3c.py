@@ -44,14 +44,20 @@ class A3C:
         """
         inp = Input((self.env_dim))
         # If we have an image, apply convolutional layers
-        if(len(self.env_dim) > 2):
+        if(len(self.env_dim) > 2): 
+            # Images
             x = Reshape((self.env_dim[1], self.env_dim[2], -1))(inp)
             x = conv_block(x, 32, (2, 2))
             x = conv_block(x, 32, (2, 2))
             x = Flatten()(x)
-        else:
+        elif(len(self.env_dim)==2):
+            # 2D Inputs
             x = Flatten()(inp)
             x = Dense(64, activation='relu')(x)
+            x = Dense(128, activation='relu')(x)
+        else:
+            # 1D Inputs
+            x = Dense(64, activation='relu')(inp)
             x = Dense(128, activation='relu')(x)
         return Model(inp, x)
 
