@@ -83,6 +83,9 @@ $ python3 main.py --type DDQN --env CartPole-v1 --batch_size 64 --dueling
 
 # Visualization & Monitoring
 
+### Model Visualization
+All models are saved under ```<algorithm_folder>/models/``` when finished training. You can visualize them running in the same environment they were trained in by running the ```load_and_run.py``` script. For DQN models, you should specify the path to the desired model in the ```--model_path``` argument. For actor-critic models, you need to specify both weight files in the ```--actor_path``` and ```--critic_path``` arguments.
+
 ### Tensorboard monitoring
 Using tensorboard, you can monitor the agent's score as it is training. When training, a log folder with the name matching the chosen environment will be created. For example, to follow the A2C progression on CartPole-v1, simply run:
 ```bash
