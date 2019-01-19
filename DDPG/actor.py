@@ -3,7 +3,7 @@ import tensorflow as tf
 import keras.backend as K
 
 from keras.initializers import RandomUniform
-from keras.models import Model, load_model
+from keras.models import Model
 from keras.layers import Input, Dense, Reshape, LSTM, Lambda, BatchNormalization, GaussianNoise, Flatten
 
 class Actor:
@@ -69,3 +69,9 @@ class Actor:
         params_grad = tf.gradients(self.model.output, self.model.trainable_weights, -action_gdts)
         grads = zip(params_grad, self.model.trainable_weights)
         return K.function([self.model.input, action_gdts], [tf.train.AdamOptimizer(self.lr).apply_gradients(grads)])
+
+    def save(self, path):
+        self.model.save_weights(path + '_actor.h5')
+
+    def load_weights(self, path):
+        self.model.load_weights(path)

@@ -30,3 +30,9 @@ class Critic(Agent):
         critic_loss = K.mean(K.square(self.discounted_r - self.model.output))
         updates = self.rms_optimizer.get_updates(self.model.trainable_weights, [], critic_loss)
         return K.function([self.model.input, self.discounted_r], [], updates=updates)
+
+    def save(self, path):
+        self.model.save_weights(path + '_critic.h5')
+
+    def load_weights(self, path):
+        self.model.load_weights(path)

@@ -23,6 +23,7 @@ class A2C:
         self.act_dim = act_dim
         self.env_dim = (k,) + env_dim
         self.gamma = gamma
+        self.lr = lr
         # Create actor and critic networks
         self.shared = self.buildNetwork()
         self.actor = Actor(self.env_dim, act_dim, self.shared, lr)
@@ -113,3 +114,12 @@ class A2C:
             tqdm_e.refresh()
 
         return results
+
+    def save_weights(self, path):
+        path += '_LR_{}'.format(self.lr)
+        self.actor.save(path)
+        self.critic.save(path)
+
+    def load_weights(self, path_actor, path_critic):
+        self.critic.load_weights(path_critic)
+        self.actor.load_weights(path_actor)

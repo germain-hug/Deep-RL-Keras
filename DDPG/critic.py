@@ -3,7 +3,7 @@ import tensorflow as tf
 import keras.backend as K
 
 from keras.initializers import RandomUniform
-from keras.models import Model, load_model
+from keras.models import Model
 from keras.optimizers import Adam
 from keras.layers import Input, Dense, concatenate, LSTM, Reshape, BatchNormalization, Lambda, Flatten
 
@@ -57,3 +57,9 @@ class Critic:
         for i in range(len(W)):
             target_W[i] = self.tau * W[i] + (1 - self.tau)* target_W[i]
         self.target_model.set_weights(target_W)
+
+    def save(self, path):
+        self.model.save_weights(path + '_critic.h5')
+
+    def load_weights(self, path):
+        self.model.load_weights(path)

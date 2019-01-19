@@ -130,3 +130,12 @@ class DDQN:
         else:
             td_error = 0
         self.buffer.memorize(state, action, reward, done, new_state, td_error)
+
+    def save_weights(self, path):
+        path += '_LR_{}'.format(self.lr)
+        if(self.with_per):
+            path += '_PER'
+        self.agent.save(path)
+
+    def load_weights(self, path):
+        self.agent.load_weights(path)

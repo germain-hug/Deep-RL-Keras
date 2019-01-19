@@ -31,6 +31,7 @@ class A3C:
         else:
             self.env_dim = (k,) + env_dim
         self.gamma = gamma
+        self.lr = lr
         # Create actor and critic networks
         self.shared = self.buildNetwork()
         self.actor = Actor(self.env_dim, act_dim, self.shared, lr)
@@ -44,7 +45,7 @@ class A3C:
         """
         inp = Input((self.env_dim))
         # If we have an image, apply convolutional layers
-        if(len(self.env_dim) > 2): 
+        if(len(self.env_dim) > 2):
             # Images
             x = Reshape((self.env_dim[1], self.env_dim[2], -1))(inp)
             x = conv_block(x, 32, (2, 2))
@@ -120,3 +121,12 @@ class A3C:
         [t.join() for t in threads]
 
         return None
+
+    def save_weights(self, path):
+        path += '_LR_{}'.format(self.lr)
+        self.actor.save(path)
+        self.critic.save(path)
+
+    def load_weights(self, path_actor, path_critic):
+        self.critic.load_weights(path_critic)
+        self.actor.load_weights(path_actor)

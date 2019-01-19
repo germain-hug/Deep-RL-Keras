@@ -2,8 +2,8 @@ import sys
 import numpy as np
 import keras.backend as K
 
-from keras.models import Model
 from keras.optimizers import Adam
+from keras.models import Model
 from keras.layers import Input, Dense, Flatten, Reshape, LSTM, Lambda
 from keras.regularizers import l2
 from utils.networks import conv_block
@@ -16,6 +16,7 @@ class Agent:
         self.state_dim = state_dim
         self.action_dim = action_dim
         self.tau = tau
+        self.dueling = dueling
         # Initialize Deep Q-Network
         self.model = self.network(dueling)
         self.model.compile(Adam(lr), 'mse')
@@ -81,3 +82,11 @@ class Agent:
         if len(x.shape) < 4 and len(self.state_dim) > 2: return np.expand_dims(x, axis=0)
         elif len(x.shape) < 3: return np.expand_dims(x, axis=0)
         else: return x
+
+    def save(self, path):
+        if(self.dueling):
+            path += '_dueling'
+        self.model.save_weights(path + '.h5')
+
+    def load_weights(self, path):
+        self.model.load_weights(path)
