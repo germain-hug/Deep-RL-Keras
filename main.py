@@ -1,4 +1,4 @@
-""" Deep Q-Learning for OpenAI Gym environment
+""" Deep RL Algorithms for OpenAI Gym environments
 """
 
 import os
@@ -100,15 +100,19 @@ def main(args=None):
         df = pd.DataFrame(np.array(stats))
         df.to_csv(args.type + "/logs.csv", header=['Episode', 'Mean', 'Stddev'], float_format='%10.5f')
 
-    # Display agent
-    old_state, time = env.reset(), 0
-    while True:
-        env.render()
-        a = algo.policy_action(old_state)
-        old_state, r, done, _ = env.step(a)
-        time += 1
-        if done: env.reset()
+    # Save weights and close environments
+    exp_dir = '{}/models/'.format(args.type)
+    if not os.path.exists(exp_dir):
+        os.makedirs(exp_dir)
 
+    export_path = '{}{}_ENV_{}_NB_EP_{}_BS_{}'.format(exp_dir,
+        args.type,
+        args.env,
+        args.nb_episodes,
+        args.batch_size)
+
+    algo.save_weights(export_path)
+    env.env.close()
 
 if __name__ == "__main__":
     main()
