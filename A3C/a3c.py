@@ -106,6 +106,7 @@ class A3C:
 
         threads = [threading.Thread(
                 target=training_thread,
+                daemon=True,
                 args=(self,
                     args.nb_episodes,
                     envs[i],
@@ -117,9 +118,14 @@ class A3C:
 
         for t in threads:
             t.start()
-            time.sleep(1)
-        [t.join() for t in threads]
+            time.sleep(0.5)
 
+        try:
+            [t.join(1) for t in threads]
+        except KeyboardInterrupt:
+            print("Exiting all threads...")
+            for t in threads:
+                t.kill_received = True
         return None
 
     def save_weights(self, path):
