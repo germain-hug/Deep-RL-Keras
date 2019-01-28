@@ -101,8 +101,7 @@ class A3C:
             action_dim = gym.make(args.env).action_space.n
 
         # Create threads
-        factor = 100.0 / (args.nb_episodes)
-        tqdm_e = tqdm(range(args.nb_episodes), desc='Score', leave=True, unit=" episodes")
+        tqdm_e = tqdm(range(int(args.nb_episodes)), desc='Score', leave=True, unit=" episodes")
 
         threads = [threading.Thread(
                 target=training_thread,
@@ -114,18 +113,15 @@ class A3C:
                     args.training_interval,
                     summary_writer,
                     tqdm_e,
-                    factor)) for i in range(args.n_threads)]
+                    args.render)) for i in range(args.n_threads)]
 
         for t in threads:
             t.start()
             time.sleep(0.5)
-
         try:
-            [t.join(1) for t in threads]
+            [t.join() for t in threads]
         except KeyboardInterrupt:
             print("Exiting all threads...")
-            for t in threads:
-                t.kill_received = True
         return None
 
     def save_weights(self, path):
