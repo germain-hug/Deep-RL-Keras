@@ -29,6 +29,9 @@ class Environment(object):
             self.state_buffer.append(x_t)
         return s_t
 
+    def reset_one(self):
+        return self.env.reset()
+
     def step(self, action):
         x_t1, r_t, terminal, info = self.env.step(action)
         previous_states = np.array(self.state_buffer)
@@ -39,6 +42,9 @@ class Environment(object):
         self.state_buffer.popleft()
         self.state_buffer.append(x_t1)
         return s_t1, r_t, terminal, info
+
+    def step_one(self, action):
+        return self.env.step(action)
 
     def render(self):
         return self.env.render()
