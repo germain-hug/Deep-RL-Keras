@@ -71,6 +71,7 @@ class A2C:
         """
 
         results = []
+        global_rewards = []
 
         # Main Loop
         tqdm_e = tqdm(range(args.nb_episodes), desc='Score', leave=True, unit=" episodes")
@@ -103,6 +104,7 @@ class A2C:
             if(args.gather_stats):
                 mean, stdev = gather_stats(self, env)
                 results.append([e, mean, stdev])
+                global_rewards.append(cumul_reward)
 
             # Export results for Tensorboard
             score = tfSummary('score', cumul_reward)
@@ -113,7 +115,7 @@ class A2C:
             tqdm_e.set_description("Score: " + str(cumul_reward))
             tqdm_e.refresh()
 
-        return results
+        return global_rewards
 
     def save_weights(self, path):
         path += '_LR_{}'.format(self.lr)

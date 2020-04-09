@@ -39,6 +39,7 @@ class A3C:
         # Build optimizers
         self.a_opt = self.actor.optimizer()
         self.c_opt = self.critic.optimizer()
+        self.global_rewards = []
 
     def buildNetwork(self):
         """ Assemble shared layers
@@ -122,7 +123,8 @@ class A3C:
             [t.join() for t in threads]
         except KeyboardInterrupt:
             print("Exiting all threads...")
-        return None
+            
+        return self.global_rewards
 
     def save_weights(self, path):
         path += '_LR_{}'.format(self.lr)
