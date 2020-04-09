@@ -16,7 +16,7 @@ class A2C:
     """ Actor-Critic Main Algorithm
     """
 
-    def __init__(self, act_dim, env_dim, k, gamma = 0.99, lr = 0.0001):
+    def __init__(self, act_dim, env_dim, k, gamma = 0.99, lr = 0.0001, is_eval=False):
         """ Initialization
         """
         # Environment and A2C parameters
@@ -24,6 +24,7 @@ class A2C:
         self.env_dim = (k,) + env_dim
         self.gamma = gamma
         self.lr = lr
+        self.is_eval = is_eval
         # Create actor and critic networks
         self.shared = self.buildNetwork()
         self.actor = Actor(self.env_dim, act_dim, self.shared, lr)
@@ -44,6 +45,8 @@ class A2C:
     def policy_action(self, s):
         """ Use the actor to predict the next action to take, using the policy
         """
+        if self.is_eval:
+            return np.argmax(self.actor.predict(s).ravel())
         return np.random.choice(np.arange(self.act_dim), 1, p=self.actor.predict(s).ravel())[0]
 
     def discount(self, r):
