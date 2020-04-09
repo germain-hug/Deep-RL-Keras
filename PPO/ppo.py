@@ -19,7 +19,8 @@ class PPO:
     """ Actor-Critic Main Algorithm
     """
 
-    def __init__(self, act_dim, env_dim, k, gamma = 0.99, lr = 0.0001, loss_clipping=0.2, noise=1.0, entropy_loss=5e-3):
+    def __init__(self, act_dim, env_dim, k, gamma = 0.99, lr = 0.0001, 
+                loss_clipping=0.2, noise=1.0, entropy_loss=5e-3):
         """ Initialization
         """
         # PPO Params
@@ -215,12 +216,12 @@ class PPO:
         action_matrix[action] = 1
         return action, action_matrix, p
 
-    def get_batch(self, env):
-        BUFFER_SIZE = 2048
+    def get_batch(self, env, args):
         batch = [[], [], [], []]
-
+        
         tmp_batch = [[], [], []]
-        while len(batch[0]) < BUFFER_SIZE:
+
+        while len(batch[0]) < args.buffer_size:
             env.render()
 
             action, action_matrix, predicted_action = self.get_action()
@@ -259,28 +260,23 @@ class PPO:
         return obs, action, pred, reward
 
     def train(self, env, args, summary_writer):
-        EPISODES = 100_000
-        BATCH_SIZE = 4096
-        BUFFER_SIZE = 2048
-        EPOCHS=10
-
         self.observation = env.reset_one()
         self.reward = []
         self.reward_over_time = []
         self.gradient_steps = 0
         self.episode = 1
 
-        while self.episode < EPISODES:
-            print("Episode: ", self.episode)
-            obs, action, pred, reward = self.get_batch(env)
-            obs, action, pred, reward = obs[:BUFFER_SIZE], action[:BUFFER_SIZE], pred[:BUFFER_SIZE], reward[:BUFFER_SIZE]
+        while self.episode < args.nb_episodes:
+            print("Episode ", self.episode)
+            obs, action, pred, reward = self.get_batch(env, args)
+            obs, action, pred, reward = obs[:args.buffer_size], action[:args.buffer_size], pred[:args.buffer_size], reward[:args.buffer_size]
             old_prediction = pred
             pred_values = self.critic.predict(obs)
 
             advantage = reward - pred_values
 
-            actor_loss = self.actor.fit([obs, advantage, old_prediction], [action], batch_size=BATCH_SIZE, shuffle=True, epochs=EPOCHS, verbose=False)
-            critic_loss = self.critic.fit([obs], [reward], batch_size=BATCH_SIZE, shuffle=True, epochs=EPOCHS, verbose=False)
+            actor_loss = self.actor.fit([obs, advantage, old_prediction], [action], batch_size=args.batch_size, shuffle=True, epochs=args.epochs, verbose=False)
+            critic_loss = self.critic.fit([obs], [reward], batch_size=args.batch_size, shuffle=True, epochs=args.epochs, verbose=False)
             # summary_writer.add_scalar('Actor loss', actor_loss.history['loss'][-1], self.gradient_steps)
             # summary_writer.add_scalar('Critic loss', critic_loss.history['loss'][-1], self.gradient_steps)
             
