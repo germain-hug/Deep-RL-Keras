@@ -20,7 +20,7 @@ class PPO:
     """
 
     def __init__(self, act_dim, env_dim, k, gamma = 0.99, lr = 0.0001, 
-                loss_clipping=0.2, noise=1.0, entropy_loss=5e-3):
+                loss_clipping=0.2, noise=1.0, entropy_loss=5e-3, is_eval=False):
         """ Initialization
         """
         # PPO Params
@@ -34,54 +34,31 @@ class PPO:
         self.gamma = gamma
         self.lr = lr
 
-        # # Create actor and critic networks
-        # self.shared = self.buildNetwork()
-        # self.actor = Actor(self.env_dim, act_dim, self.shared, lr)
-        # self.critic = Critic(self.env_dim, act_dim, self.shared, lr)
-
-        # # Build optimizers
-        # self.a_opt = self.actor.optimizer()
-        # self.c_opt = self.critic.optimizer()
-
-
         self.actor = Actor(self.env_dim, self.act_dim, self.lr, 
             loss_clipping=self.loss_clipping, entropy_loss=self.entropy_loss)
         self.critic = Critic(self.env_dim, act_dim, lr)
 
         self.observation = None
         self.val = False
+        self.is_eval = is_eval
 
-    # def buildNetwork(self):
-    #     """ Assemble shared layers
-    #     """
-    #     inp = Input((self.env_dim))
-    #     x = Flatten()(inp)
-    #     x = Dense(64, activation='relu')(x)
-    #     x = Dense(128, activation='relu')(x)
-    #     return Model(inp, x)
-
-    def save_weights(self, path):
-        path += '_LR_{}'.format(self.lr)
-        self.actor.save(path)
-        self.critic.save(path)
-
-    def load_weights(self, path_actor, path_critic):
-        self.critic.load_weights(path_critic)
-        self.actor.load_weights(path_actor)
-
-
-
-
-    # ********************************************************
-    # Colocar em outro lugar
-    # ********************************************************
 
     def transform_reward(self):
-        GAMMA = 0.99
         for j in range(len(self.reward) - 2, -1, -1):
-            self.reward[j] += self.reward[j + 1] * GAMMA
+            self.reward[j] += self.reward[j + 1] * self.gamma
+
+    def policy_action(self, s):
+        """ Use the actor's network to predict the next action to take, using the policy
+        """
+        DUMMY_ACTION, DUMMY_VALUE = np.zeros((1, self.act_dim)), np.zeros((1, 1))
+        p = self.actor.predict([s.reshape(1, self.env_dim), DUMMY_VALUE, DUMMY_ACTION])
+        if self.is_eval:
+            return np.argmax(p.ravel())
+        return np.random.choice(np.arange(self.act_dim), 1, p=p)[0]
 
     def get_action(self):
+        """ Use the actor's network to get next actions based on observation spaces
+        """
         DUMMY_ACTION, DUMMY_VALUE = np.zeros((1, self.act_dim)), np.zeros((1, 1))
 
         p = self.actor.predict([self.observation.reshape(1, self.env_dim), DUMMY_VALUE, DUMMY_ACTION])
@@ -150,6 +127,7 @@ class PPO:
 
         while self.episode < args.nb_episodes:
             print("Episode ", self.episode)
+
             obs, action, pred, reward = self.get_batch(env, args)
             obs, action, pred, reward = obs[:args.buffer_size], action[:args.buffer_size], pred[:args.buffer_size], reward[:args.buffer_size]
             old_prediction = pred
@@ -157,11 +135,13 @@ class PPO:
 
             advantage = reward - pred_values
 
+            # Train Actor and Critic
             actor_loss = self.actor.fit([obs, advantage, old_prediction], [action], batch_size=args.batch_size, shuffle=True, epochs=args.epochs, verbose=False)
             critic_loss = self.critic.fit([obs], [reward], batch_size=args.batch_size, shuffle=True, epochs=args.epochs, verbose=False)
             # summary_writer.add_scalar('Actor loss', actor_loss.history['loss'][-1], self.gradient_steps)
             # summary_writer.add_scalar('Critic loss', critic_loss.history['loss'][-1], self.gradient_steps)
             
+            # Get info
             self.batch_rewards.append(np.sum(reward))
             self.actor_losses.append(actor_loss.history['loss'])
             self.critic_losses.append(critic_loss.history['loss'])
@@ -169,3 +149,14 @@ class PPO:
             self.gradient_steps += 1
 
         return self.batch_rewards, self.actor_losses, self.critic_losses
+
+
+
+    def save_weights(self, path):
+        path += '_LR_{}'.format(self.lr)
+        self.actor.save(path)
+        self.critic.save(path)
+
+    def load_weights(self, path_actor, path_critic):
+        self.critic.load_weights(path_critic)
+        self.actor.load_weights(path_actor)
