@@ -14,12 +14,12 @@ class Agent:
     def fit(self, inp, targ, verbose=False, shuffle=False, epochs=1, callbacks=None, batch_size=None):
         """ Perform one epoch of training
         """
-        self.model.fit(self.reshape(inp), targ, epochs=epochs, verbose=verbose, shuffle=shuffle, callbacks=callbacks, batch_size=batch_size)
+        return self.model.fit(inp, targ, epochs=epochs, verbose=verbose, shuffle=shuffle, callbacks=callbacks, batch_size=batch_size)
 
     def predict(self, inp):
         """ Critic Value Prediction
         """
-        return self.model.predict(self.reshape(inp))
+        return self.model.predict(inp)
 
     def reshape(self, x):
         if len(x.shape) < 4 and len(self.inp_dim) > 2: return np.expand_dims(x, axis=0)

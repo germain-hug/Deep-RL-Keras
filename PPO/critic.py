@@ -34,17 +34,6 @@ class Critic(Agent):
 
         return model
 
-    def fit(self, inp, targ, verbose=False, shuffle=False, epochs=1, callbacks=None, batch_size=None):
-        """ Perform one epoch of training
-        """
-        return self.model.fit(inp, targ, epochs=epochs, verbose=verbose, shuffle=shuffle, callbacks=callbacks, batch_size=batch_size)
-
-    def predict(self, inp):
-        """ 
-        Critic Value Prediction
-        """
-        return self.model.predict(inp)
-
     # def addHead(self, network):
     #     """ Assemble Critic network to predict value of each state
     #     """

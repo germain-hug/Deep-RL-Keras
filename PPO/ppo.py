@@ -44,7 +44,8 @@ class PPO:
         # self.c_opt = self.critic.optimizer()
 
 
-        self.actor = self.build_actor()
+        self.actor = Actor(self.env_dim, self.act_dim, self.lr, 
+            loss_clipping=self.loss_clipping, entropy_loss=self.entropy_loss)
         self.critic = Critic(self.env_dim, act_dim, lr)
 
         self.observation = None
@@ -74,34 +75,6 @@ class PPO:
     # ********************************************************
     # Colocar em outro lugar
     # ********************************************************
-
-    def build_actor(self):
-        HIDDEN_SIZE = 128
-        NUM_LAYERS = 2
-        state_input = Input(shape=(self.env_dim,))
-        advantage = Input(shape=(1,))
-        old_prediction = Input(shape=(self.act_dim,))
-
-        x = Dense(HIDDEN_SIZE, activation='tanh')(state_input)
-        for _ in range(NUM_LAYERS - 1):
-            x = Dense(HIDDEN_SIZE, activation='tanh')(x)
-
-        out_actions = Dense(self.act_dim, activation='softmax', name='output')(x)
-
-        model = Model(inputs=[state_input, advantage, old_prediction], outputs=[out_actions])
-        model.compile(optimizer=Adam(lr=self.lr),
-                      loss=[
-                          proximal_policy_optimization_loss(
-                            advantage=advantage,
-                            old_prediction=old_prediction,
-                            loss_clipping=self.loss_clipping,
-                            entropy_loss=self.entropy_loss
-                          )
-                        ]
-                    )
-        model.summary()
-
-        return model
 
     def transform_reward(self):
         GAMMA = 0.99
