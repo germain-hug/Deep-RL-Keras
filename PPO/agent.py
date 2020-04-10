@@ -11,10 +11,10 @@ class Agent:
         self.tau = tau
         self.rms_optimizer = RMSprop(lr=lr, epsilon=0.1, rho=0.99)
 
-    def fit(self, inp, targ, verbose=False, shuffle=False, epochs=1, callbacks=None):
+    def fit(self, inp, targ, verbose=False, shuffle=False, epochs=1, callbacks=None, batch_size=None):
         """ Perform one epoch of training
         """
-        self.model.fit(self.reshape(inp), targ, epochs=epochs, verbose=verbose, shuffle=shuffle, callbacks=callbacks)
+        self.model.fit(self.reshape(inp), targ, epochs=epochs, verbose=verbose, shuffle=shuffle, callbacks=callbacks, batch_size=batch_size)
 
     def predict(self, inp):
         """ Critic Value Prediction
