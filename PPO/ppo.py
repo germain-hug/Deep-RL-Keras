@@ -120,14 +120,15 @@ class PPO:
         self.reward_over_time = []
         self.gradient_steps = 0
         self.episode = 1
+        self.last_ep_recorded = 1
 
         self.batch_rewards = []
         self.actor_losses = []
         self.critic_losses = []
 
-        while self.episode < args.nb_episodes:
-            print("Episode ", self.episode)
+        tqdm_e = tqdm(total=args.nb_episodes, desc='Score per bash', leave=True, unit=" episodes")
 
+        while self.episode < args.nb_episodes:
             obs, action, pred, reward = self.get_batch(env, args)
             obs, action, pred, reward = obs[:args.buffer_size], action[:args.buffer_size], pred[:args.buffer_size], reward[:args.buffer_size]
             old_prediction = pred
@@ -148,6 +149,12 @@ class PPO:
 
             self.gradient_steps += 1
 
+            # Update progress bar
+            tqdm_e.set_description("Score per bash: " + str(np.sum(reward)))
+            tqdm_e.update(self.episode - self.last_ep_recorded)
+            self.last_ep_recorded = self.episode
+
+        tqdm_e.close()
         return self.batch_rewards, self.actor_losses, self.critic_losses
 
 
