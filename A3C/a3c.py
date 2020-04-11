@@ -21,7 +21,7 @@ class A3C:
     """ Asynchronous Actor-Critic Main Algorithm
     """
 
-    def __init__(self, act_dim, env_dim, k, gamma = 0.99, lr = 0.0001, is_atari=False):
+    def __init__(self, act_dim, env_dim, k, gamma = 0.99, lr = 0.0001, is_atari=False, is_eval=False):
         """ Initialization
         """
         # Environment and A3C parameters
@@ -32,6 +32,7 @@ class A3C:
             self.env_dim = (k,) + env_dim
         self.gamma = gamma
         self.lr = lr
+        self.is_eval = is_eval
         # Create actor and critic networks
         self.shared = self.buildNetwork()
         self.actor = Actor(self.env_dim, act_dim, self.shared, lr)
@@ -39,6 +40,7 @@ class A3C:
         # Build optimizers
         self.a_opt = self.actor.optimizer()
         self.c_opt = self.critic.optimizer()
+        self.global_rewards = []
 
     def buildNetwork(self):
         """ Assemble shared layers
@@ -65,6 +67,8 @@ class A3C:
     def policy_action(self, s):
         """ Use the actor's network to predict the next action to take, using the policy
         """
+        if self.is_eval:
+            return np.argmax(self.actor.predict(s).ravel())
         return np.random.choice(np.arange(self.act_dim), 1, p=self.actor.predict(s).ravel())[0]
 
     def discount(self, r, done, s):
@@ -122,7 +126,8 @@ class A3C:
             [t.join() for t in threads]
         except KeyboardInterrupt:
             print("Exiting all threads...")
-        return None
+            
+        return self.global_rewards
 
     def save_weights(self, path):
         path += '_LR_{}'.format(self.lr)
