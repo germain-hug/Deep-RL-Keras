@@ -39,7 +39,6 @@ def training_thread(agent, Nmax, env, action_dim, f, summary_writer, tqdm, rende
             if(time%f==0 or done):
                 lock.acquire()
                 agent.train_models(states, actions, rewards, done)
-                agent.global_rewards.append(cumul_reward)
                 lock.release()
                 actions, states, rewards = [], [], []
 
